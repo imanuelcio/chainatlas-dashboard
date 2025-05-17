@@ -8,6 +8,7 @@ import { usersAPI, authAPI } from "@/lib/api";
 import { UserProfile } from "@/types/user";
 import toast from "react-hot-toast";
 import { logout } from "@/lib/auth";
+import Image from "next/image";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -433,16 +434,12 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="h-10 w-10 bg-[#5865F2] bg-opacity-20 rounded-full flex items-center justify-center mr-4">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 127.14 96.36"
-                        className="h-5 w-5 text-[#5865F2]"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"
-                        />
-                      </svg>
+                      <Image
+                        src="/icons/discord.svg"
+                        alt="Discord"
+                        width={40}
+                        height={40}
+                      />
                     </div>
                     <div>
                       <h3 className="font-medium">Discord</h3>
@@ -472,16 +469,12 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="h-10 w-10 bg-[#1DA1F2] bg-opacity-20 rounded-full flex items-center justify-center mr-4">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        className="h-5 w-5 text-[#1DA1F2]"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 9.99 9.99 0 01-3.159 1.207 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.937 4.937 0 004.604 3.417 9.868 9.868 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63a9.936 9.936 0 002.46-2.548l-.047-.02z"
-                        />
-                      </svg>
+                      <Image
+                        src="/icons/twitter.svg"
+                        alt="Discord"
+                        width={40}
+                        height={40}
+                      />
                     </div>
                     <div>
                       <h3 className="font-medium">Twitter</h3>
@@ -517,16 +510,12 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="h-10 w-10 bg-[#0088cc] bg-opacity-20 rounded-full flex items-center justify-center mr-4">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        className="h-5 w-5 text-[#0088cc]"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm.37 17.754c-.38.107-.8.07-1.195-.008-.39-.078-.78-.26-1.128-.547l-2.98-2.395.787-.62 2.704 1.92c.154.12.306.163.448.132.14-.03.27-.13.38-.3l4.216-6.607-4.733 7.465c-.262.41-.566.846-1.117.96zm4.286-1.504c-.306.34-.69.577-1.13.68-.44.104-.885.078-1.302-.022-.416-.1-.814-.295-1.178-.576-.364-.28-.687-.643-.958-1.067-.57-.894-.957-1.977-1.234-3.138-.29-1.16-.467-2.394-.526-3.61-.05-1.22.02-2.414.24-3.46.11-.512.276-.986.5-1.397.21-.404.49-.742.815-.984.324-.243.695-.384 1.08-.41.385-.026.775.042 1.146.2.376.16.73.41 1.043.736l.654.73-5.95 9.313c-.107.168-.164.35-.157.538.006.19.073.37.19.518.117.153.28.266.463.33.18.057.38.066.567.02.187-.05.36-.15.503-.29.145-.143.255-.32.32-.516.066-.198.086-.413.053-.62-.033-.208-.114-.403-.233-.57l.43-.673L18.496 8.1l-3.614 5.733c-.125.197-.158.44-.086.67.073.228.243.418.47.535.228.116.498.136.75.05.253-.084.468-.26.6-.488.135-.232.182-.506.143-.77-.04-.268-.16-.514-.34-.696z"
-                        />
-                      </svg>
+                      <Image
+                        src="/icons/telegram.svg"
+                        alt="Discord"
+                        width={40}
+                        height={40}
+                      />
                     </div>
                     <div>
                       <h3 className="font-medium">Telegram</h3>

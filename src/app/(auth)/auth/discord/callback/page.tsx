@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation"; // Menggunakan useSearchParams dari Next.js
 import { toast } from "react-hot-toast";
-
 const AuthCallback = () => {
   const router = useRouter();
   const searchParams = useSearchParams(); // Hook untuk mendapatkan query parameters di Next.js

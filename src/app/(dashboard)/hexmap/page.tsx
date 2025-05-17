@@ -21,7 +21,7 @@ export default function HexMapPage() {
     s: number;
   } | null>(null);
   const [hexName, setHexName] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
