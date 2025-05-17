@@ -8,14 +8,11 @@ import { badgesAPI, usersAPI } from "@/lib/api";
 import toast from "react-hot-toast";
 import { Badge } from "@/types/badges";
 
-interface PageProps {
-  params: {
-    id: string;
-  };
-  searchParams: Record<string, string | string[] | undefined>;
-}
-
-export default function BadgeDetailPage({ params, searchParams }: PageProps) {
+export default function BadgeDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const router = useRouter();
   const [badge, setBadge] = useState<Badge | null>(null);
   const [relatedBadges, setRelatedBadges] = useState<Badge[]>([]);
