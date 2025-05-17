@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { eventsAPI } from "@/lib/api";
@@ -9,16 +9,12 @@ import { EventWithDetails } from "@/types/event";
 import toast from "react-hot-toast";
 import { Badge } from "@/types/badges";
 
-export default function EventDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function EventDetailPage() {
   const router = useRouter();
   const [event, setEvent] = useState<EventWithDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
-
+  const params = useParams() as { id: string };
   useEffect(() => {
     const fetchEvent = async () => {
       setIsLoading(true);
