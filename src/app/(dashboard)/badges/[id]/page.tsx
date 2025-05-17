@@ -1,18 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { badgesAPI, usersAPI } from "@/lib/api";
 import toast from "react-hot-toast";
 import { Badge } from "@/types/badges";
 
-export default function BadgeDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function BadgeDetailPage() {
   const router = useRouter();
   const [badge, setBadge] = useState<Badge | null>(null);
   const [relatedBadges, setRelatedBadges] = useState<Badge[]>([]);
@@ -20,7 +16,7 @@ export default function BadgeDetailPage({
   const [earnedDate, setEarnedDate] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingRelated, setIsLoadingRelated] = useState(true);
-
+  const params = useParams() as { id: string };
   useEffect(() => {
     const fetchBadge = async () => {
       setIsLoading(true);
