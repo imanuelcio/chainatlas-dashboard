@@ -8,11 +8,14 @@ import { badgesAPI, usersAPI } from "@/lib/api";
 import toast from "react-hot-toast";
 import { Badge } from "@/types/badges";
 
-export default function BadgeDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+interface PageProps {
+  params: {
+    id: string;
+  };
+  searchParams: Record<string, string | string[] | undefined>;
+}
+
+export default function BadgeDetailPage({ params, searchParams }: PageProps) {
   const router = useRouter();
   const [badge, setBadge] = useState<Badge | null>(null);
   const [relatedBadges, setRelatedBadges] = useState<Badge[]>([]);
@@ -25,11 +28,9 @@ export default function BadgeDetailPage({
     const fetchBadge = async () => {
       setIsLoading(true);
       try {
-        // Fetch badge details
         const badgeResponse = await badgesAPI.getBadgeById(params.id);
         setBadge(badgeResponse.badge);
 
-        // Check if user has earned this badge
         const userBadgesResponse = await usersAPI.getUserBadges();
         const earnedBadge = userBadgesResponse.badges.find(
           (item) => item.badge.id === params.id
@@ -54,16 +55,12 @@ export default function BadgeDetailPage({
   useEffect(() => {
     const fetchRelatedBadges = async () => {
       if (!badge) return;
-
       setIsLoadingRelated(true);
       try {
-        // Fetch badges in the same category
         const response = await badgesAPI.getAllBadges(badge.category);
-        // Filter out the current badge and limit to 3
         const filtered = response.badges
           .filter((b) => b.id !== badge.id)
           .slice(0, 3);
-
         setRelatedBadges(filtered);
       } catch (error) {
         console.error("Error fetching related badges:", error);
