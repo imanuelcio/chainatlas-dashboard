@@ -129,7 +129,7 @@ export const usersAPI = {
 
 export const loginWithDiscord = () => {
   const redirectUri = encodeURIComponent(
-    "http://localhost:5000/api/auth/discord/callback"
+    "https://dashboard.atlashubs-bot.xyz/api/auth/discord/callback"
   );
   const clientId = "1371822985115074650";
   const scope = encodeURIComponent("identify guilds");
