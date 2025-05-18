@@ -12,8 +12,8 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 
 export const metadata = {
-  title: "Web3 Project Management Dashboard",
-  description: "Manage your Web3 projects, events, badges, and more.",
+  title: "ChainAtlas",
+  description: "ChainAtlas Dashboard",
 };
 
 export default function RootLayout({

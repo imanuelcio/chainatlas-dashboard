@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { walletAuth, discordAuth } from "../../../lib/auth";
 import toast from "react-hot-toast";
 import { loginWithDiscord } from "@/lib/api";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();

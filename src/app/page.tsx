@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
@@ -114,20 +115,13 @@ export default function Home() {
             <div className="h-16 w-16 sm:h-20 sm:w-20 mx-auto relative">
               <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-full opacity-60 animate-pulse"></div>
               <div className="absolute inset-1 bg-black rounded-full flex items-center justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 sm:h-10 sm:w-10 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
+                <Image
+                  src={"/logo/logo.svg"}
+                  className="rounded-full"
+                  width={100}
+                  height={100}
+                  alt="logo"
+                />
               </div>
             </div>
           </div>
