@@ -82,8 +82,6 @@ export default function ProfilePage() {
   };
 
   const handleConnect = async (platform: string) => {
-    // This is a placeholder for connecting to external platforms
-    // Would normally open a popup or redirect to OAuth flow
     toast.error(`${platform} connection not implemented yet.`);
   };
 
@@ -158,7 +156,6 @@ export default function ProfilePage() {
             <div className="flex-1 text-center md:text-left">
               <h2 className="text-2xl font-bold text-white">
                 {profile.username}
-                {/* cio */}
               </h2>
               <p className="text-blue-100">
                 {profile.wallet_address

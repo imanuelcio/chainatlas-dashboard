@@ -1,11 +1,29 @@
-// File: src/pages/auth/callback.tsx
+// File: src/app/auth/callback/page.tsx
 "use client";
+
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; // Menggunakan useSearchParams dari Next.js
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
-const AuthCallback = () => {
+import { Suspense } from "react";
+
+// Loading component that will be shown during suspense
+function AuthCallbackLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <h2 className="text-xl font-semibold mb-4">
+          Completing Authentication...
+        </h2>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900 mx-auto"></div>
+      </div>
+    </div>
+  );
+}
+
+// The main component that handles the authentication logic
+function AuthCallbackContent() {
   const router = useRouter();
-  const searchParams = useSearchParams(); // Hook untuk mendapatkan query parameters di Next.js
+  const searchParams = useSearchParams();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,20 +51,10 @@ const AuthCallback = () => {
       setLoading(false);
       toast.error("Authentication failed");
     }
-  }, [searchParams, router]); // Dependensi yang benar untuk Next.js
+  }, [searchParams, router]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4">
-            Completing Authentication...
-          </h2>
-          {/* Spinner atau loading animation */}
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900 mx-auto"></div>
-        </div>
-      </div>
-    );
+    return <AuthCallbackLoading />;
   }
 
   if (error) {
@@ -77,6 +85,13 @@ const AuthCallback = () => {
       </div>
     </div>
   );
-};
+}
 
-export default AuthCallback;
+// Main component exported with Suspense boundary
+export default function AuthCallback() {
+  return (
+    <Suspense fallback={<AuthCallbackLoading />}>
+      <AuthCallbackContent />
+    </Suspense>
+  );
+}
