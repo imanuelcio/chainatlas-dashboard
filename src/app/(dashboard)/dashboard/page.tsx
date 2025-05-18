@@ -23,8 +23,6 @@ export default function DashboardPage() {
       setIsLoading(true);
       try {
         // Fetch user profile
-        const profileResponse = await usersAPI.getUserProfile();
-        setProfile(profileResponse.profile);
 
         // Fetch upcoming events
         const eventsResponse = await eventsAPI.getAllPublishedEvents({
@@ -42,6 +40,8 @@ export default function DashboardPage() {
           )
           .slice(0, 4);
         setRecentBadges(sortedBadges);
+        const profileResponse = await usersAPI.getUserProfile();
+        setProfile(profileResponse.profile);
 
         // Fetch leaderboard
         const leaderboardResponse = await usersAPI.getLeaderboard(5);

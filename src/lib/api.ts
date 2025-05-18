@@ -128,11 +128,15 @@ export const usersAPI = {
 };
 
 export const loginWithDiscord = () => {
+  const devStatus = process.env.NODE_ENV === "development";
+  const redirect_dev = process.env.DISCORD_REDIRECT_URI_DEV as string;
+  const redirect_prod = process.env.DISCORD_REDIRECT_URI_PROD as string;
+  const clientId = process.env.DISCORD_CLIENT_ID as string;
   const redirectUri = encodeURIComponent(
+    devStatus ? redirect_dev : redirect_prod
     // "https://dashboard.atlashubs-bot.xyz/api/auth/discord/callback"
-    "http://localhost:5000/api/auth/discord/callback"
+    // "http://localhost:5000/api/auth/discord/callback"
   );
-  const clientId = "1371822985115074650";
   const scope = encodeURIComponent("identify guilds");
 
   const discordOauthUrl = `https://discord.com/oauth2/authorize?response_type=code&client_id=${clientId}&scope=${scope}&redirect_uri=${redirectUri}`;
