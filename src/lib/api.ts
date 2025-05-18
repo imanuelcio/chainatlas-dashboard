@@ -128,12 +128,9 @@ export const usersAPI = {
 };
 
 export const loginWithDiscord = () => {
-  const devStatus = process.env.NODE_ENV === "development";
-  const redirect_dev = process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI_DEV!;
-  const redirect_prod = process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI_PROD!;
   const clientId = process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID!;
   const redirectUri = encodeURIComponent(
-    devStatus ? redirect_dev : redirect_prod
+    process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI as string
   );
   const scope = encodeURIComponent("identify guilds");
 
