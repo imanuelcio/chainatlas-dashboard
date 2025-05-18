@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { User } from "@/types/user";
-import { authAPI } from "@/lib/api";
+import { authAPI, usersAPI } from "@/lib/api";
+import toast from "react-hot-toast";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -15,47 +16,48 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  console.log(user);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setIsLoading(true);
+      try {
+        const profileResponse = await usersAPI.getUserProfile();
 
-  // useEffect(() => {
-  //   // Fetch user data on component mount
-  //   const fetchUser = async () => {
-  //     try {
-  //       const response = await authAPI.getCurrentUser();
-  //       setUser(response.user);
-  //     } catch (error) {
-  //       console.error("Error fetching user:", error);
-  //       // Handle authentication error - redirect to login
-  //       // window.location.href = "/login";
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
+        // Periksa apakah respons mengandung user atau profile
+        const profileData = profileResponse.profile || profileResponse.user;
 
-  //   fetchUser();
-  // }, []);
+        if (profileData) {
+          setUser(profileData);
+          // Initialize form data with current profile values
+        } else {
+          throw new Error("Profile data not found in response");
+        }
+
+        console.log("Profile response:", profileResponse);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        toast.error("Failed to load profile data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const isActive = (path: string) => {
-    return pathname === path;
+    return (
+      pathname === path || (path !== "/dashboard" && pathname.startsWith(path))
+    );
   };
 
-  // if (isLoading) {
-  //   return (
-  //     <div className="min-h-screen bg-black bg-opacity-90 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900 via-purple-900/20 to-black flex items-center justify-center">
-  //       <div className="relative flex h-16 w-16 items-center justify-center">
-  //         <div className="absolute h-full w-full animate-ping rounded-full bg-purple-500 opacity-20"></div>
-  //         <div className="absolute h-12 w-12 animate-pulse rounded-full bg-violet-500 opacity-40"></div>
-  //         <div className="h-8 w-8 rounded-full bg-violet-600"></div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
   return (
     <div className="flex min-h-screen bg-black bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 via-purple-900/10 to-black">
       {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 z-50 w-64 transform bg-black bg-opacity-70 backdrop-blur-lg border-r border-purple-900/30 transition-transform duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0`}
+        } md:translate-x-0 overflow-y-auto`}
       >
         <div className="flex h-16 items-center border-b border-purple-900/30 px-6">
           <Link
@@ -83,10 +85,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               href: "/badges",
               icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
             },
+            // {
+            //   name: "Hex Map",
+            //   href: "/hexmap",
+            //   icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z",
+            // },
             {
-              name: "Hex Map",
-              href: "/hexmap",
-              icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z",
+              name: "Leaderboard",
+              href: "/leaderboard",
+              icon: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6",
             },
             {
               name: "Profile",
@@ -133,47 +140,203 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   Admin
                 </p>
               </div>
-              {[
-                {
-                  name: "Admin Panel",
-                  href: "/admin",
-                  icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z",
-                },
-              ].map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
-                    isActive(item.href)
-                      ? "bg-fuchsia-900/30 text-white shadow-[0_0_10px_rgba(192,38,211,0.3)]"
-                      : "text-gray-300 hover:bg-fuchsia-800/20 hover:text-white"
+
+              {/* Admin Dashboard */}
+              <Link
+                href="/admin"
+                className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
+                  isActive("/admin") &&
+                  !isActive("/admin/users") &&
+                  !isActive("/admin/badges") &&
+                  !isActive("/admin/events")
+                    ? "bg-fuchsia-900/30 text-white shadow-[0_0_10px_rgba(192,38,211,0.3)]"
+                    : "text-gray-300 hover:bg-fuchsia-800/20 hover:text-white"
+                }`}
+              >
+                <svg
+                  className={`mr-3 h-5 w-5 transition-colors duration-200 ease-in-out ${
+                    isActive("/admin") &&
+                    !isActive("/admin/users") &&
+                    !isActive("/admin/badges") &&
+                    !isActive("/admin/events")
+                      ? "text-fuchsia-400"
+                      : "text-gray-400 group-hover:text-fuchsia-400"
                   }`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <svg
-                    className={`mr-3 h-5 w-5 transition-colors duration-200 ease-in-out ${
-                      isActive(item.href)
-                        ? "text-fuchsia-400"
-                        : "text-gray-400 group-hover:text-fuchsia-400"
-                    }`}
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d={item.icon}
-                    />
-                  </svg>
-                  {item.name}
-                </Link>
-              ))}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  />
+                </svg>
+                Overview
+              </Link>
+
+              {/* Users Management */}
+              <Link
+                href="/admin/users"
+                className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
+                  isActive("/admin/users")
+                    ? "bg-fuchsia-900/30 text-white shadow-[0_0_10px_rgba(192,38,211,0.3)]"
+                    : "text-gray-300 hover:bg-fuchsia-800/20 hover:text-white"
+                }`}
+              >
+                <svg
+                  className={`mr-3 h-5 w-5 transition-colors duration-200 ease-in-out ${
+                    isActive("/admin/users")
+                      ? "text-fuchsia-400"
+                      : "text-gray-400 group-hover:text-fuchsia-400"
+                  }`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
+                Users
+              </Link>
+
+              {/* Badges Management */}
+              <Link
+                href="/admin/badges"
+                className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
+                  isActive("/admin/badges")
+                    ? "bg-fuchsia-900/30 text-white shadow-[0_0_10px_rgba(192,38,211,0.3)]"
+                    : "text-gray-300 hover:bg-fuchsia-800/20 hover:text-white"
+                }`}
+              >
+                <svg
+                  className={`mr-3 h-5 w-5 transition-colors duration-200 ease-in-out ${
+                    isActive("/admin/badges")
+                      ? "text-fuchsia-400"
+                      : "text-gray-400 group-hover:text-fuchsia-400"
+                  }`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
+                Badges
+              </Link>
+
+              {/* Events Management */}
+              <Link
+                href="/admin/events"
+                className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
+                  isActive("/admin/events")
+                    ? "bg-fuchsia-900/30 text-white shadow-[0_0_10px_rgba(192,38,211,0.3)]"
+                    : "text-gray-300 hover:bg-fuchsia-800/20 hover:text-white"
+                }`}
+              >
+                <svg
+                  className={`mr-3 h-5 w-5 transition-colors duration-200 ease-in-out ${
+                    isActive("/admin/events")
+                      ? "text-fuchsia-400"
+                      : "text-gray-400 group-hover:text-fuchsia-400"
+                  }`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                Events
+              </Link>
+
+              {/* Stats & Analytics */}
+              {/* <Link
+                href="/admin/stats"
+                className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
+                  isActive("/admin/stats")
+                    ? "bg-fuchsia-900/30 text-white shadow-[0_0_10px_rgba(192,38,211,0.3)]"
+                    : "text-gray-300 hover:bg-fuchsia-800/20 hover:text-white"
+                }`}
+              >
+                <svg
+                  className={`mr-3 h-5 w-5 transition-colors duration-200 ease-in-out ${
+                    isActive("/admin/stats")
+                      ? "text-fuchsia-400"
+                      : "text-gray-400 group-hover:text-fuchsia-400"
+                  }`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+                Analytics
+              </Link> */}
+
+              {/* Settings */}
+              {/* <Link
+                href="/admin/settings"
+                className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
+                  isActive("/admin/settings")
+                    ? "bg-fuchsia-900/30 text-white shadow-[0_0_10px_rgba(192,38,211,0.3)]"
+                    : "text-gray-300 hover:bg-fuchsia-800/20 hover:text-white"
+                }`}
+              >
+                <svg
+                  className={`mr-3 h-5 w-5 transition-colors duration-200 ease-in-out ${
+                    isActive("/admin/settings")
+                      ? "text-fuchsia-400"
+                      : "text-gray-400 group-hover:text-fuchsia-400"
+                  }`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  />
+                </svg>
+                Settings
+              </Link> */}
             </>
           )}
         </nav>
+
+        {/* Version info at bottom of sidebar */}
+        <div className="mt-6 px-6 py-4 border-t border-purple-900/30">
+          <div className="flex items-center">
+            <div className="h-2 w-2 rounded-full bg-green-400 mr-2 animate-pulse"></div>
+            <p className="text-xs text-gray-400">v1.0.0</p>
+          </div>
+        </div>
       </div>
 
       {/* Mobile sidebar backdrop */}
@@ -212,12 +375,40 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </svg>
           </button>
 
-          {/* Search */}
+          {/* Page title based on current path */}
           <div className="flex-1">
-            <div className="relative max-w-md">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <h1 className="text-lg font-medium text-white">
+              {pathname === "/dashboard" && "Dashboard"}
+              {pathname === "/events" && "Events"}
+              {pathname === "/badges" && "Badges"}
+              {pathname === "/hexmap" && "Hex Map"}
+              {pathname === "/leaderboard" && "Leaderboard"}
+              {pathname === "/profile" && "Profile"}
+              {pathname === "/admin" && "Admin Overview"}
+              {pathname.startsWith("/admin/users") && "User Management"}
+              {pathname.startsWith("/admin/badges") && "Badge Management"}
+              {pathname.startsWith("/admin/events") && "Event Management"}
+              {pathname.startsWith("/admin/stats") && "Analytics"}
+              {pathname.startsWith("/admin/settings") && "Settings"}
+            </h1>
+          </div>
+
+          {/* User dropdown */}
+          <div className="flex items-center">
+            <div className="relative ml-3">
+              <button
+                type="button"
+                className="flex max-w-xs items-center rounded-full focus:outline-none focus:ring-2 focus:ring-violet-500"
+              >
+                <span className="sr-only">Open user menu</span>
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-white">
+                  {user?.username ? user.username[0].toUpperCase() : "U"}
+                </div>
+                <span className="ml-2 text-sm font-medium text-gray-300">
+                  {user?.username || "Loading..."}
+                </span>
                 <svg
-                  className="h-5 w-5 text-gray-500"
+                  className="ml-1 h-4 w-4 text-gray-400"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -227,36 +418,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    d="M19 9l-7 7-7-7"
                   />
                 </svg>
-              </div>
-              <input
-                type="text"
-                className="h-9 w-full rounded-lg bg-gray-900/60 border border-purple-900/30 pl-10 pr-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-                placeholder="Search..."
-              />
-            </div>
-          </div>
-
-          {/* User dropdown */}
-          <div className="flex items-center">
-            <div className="relative">
-              <button
-                type="button"
-                className="flex max-w-xs items-center rounded-full focus:outline-none focus:ring-2 focus:ring-violet-500"
-              >
-                <span className="sr-only">Open user menu</span>
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-white">
-                  {user?.username ? user.username[0].toUpperCase() : "U"}
-                </div>
               </button>
             </div>
           </div>
         </header>
 
         {/* Main content */}
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-6 overflow-auto">{children}</main>
 
         {/* Footer */}
         <footer className="bg-black bg-opacity-60 backdrop-blur-md border-t border-purple-900/30 p-4 text-center text-sm text-gray-500">
