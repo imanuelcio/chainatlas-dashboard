@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { usersAPI } from "@/lib/api";
+import { useAllUsers, useUpdateUserProfile, queryClient } from "@/lib/api";
 import {
   UserIcon,
   ArrowLeftIcon,
@@ -34,8 +34,8 @@ type User = {
 export default function EditUserPage() {
   const router = useRouter();
   const { id } = useParams();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const userId = Array.isArray(id) ? id[0] : id;
+
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [originalUser, setOriginalUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({
@@ -43,44 +43,41 @@ export default function EditUserPage() {
     email: "",
     profile_image_url: "",
     role: "user" as "user" | "admin",
-    // Add more fields as needed
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Use React Query for data fetching
+  const { data: usersData, isLoading } = useAllUsers();
+  const updateUserMutation = useUpdateUserProfile();
+
+  // Mock delete user mutation (not provided in API)
+  const deleteUserMutation = {
+    mutateAsync: async () => {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      return { success: true };
+    },
+    isPending: false,
+  };
+
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        setIsLoading(true);
+    if (usersData?.users && userId) {
+      const foundUser = usersData.users.find((u: User) => u._id === userId);
 
-        // In a real implementation, you would have a dedicated API endpoint
-        // For now, simulate with the existing API
-        const userResponse = await usersAPI.getAllUsers();
-        const foundUser = userResponse.users.find((u: User) => u._id === id);
-
-        if (foundUser) {
-          setOriginalUser(foundUser);
-          setFormData({
-            username: foundUser.username,
-            email: foundUser.email || "",
-            profile_image_url: foundUser.profile_image_url || "",
-            role: foundUser.role,
-          });
-        } else {
-          toast.error("User not found");
-          router.push("/admin/users");
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-        toast.error("Failed to load user data");
-      } finally {
-        setIsLoading(false);
+      if (foundUser) {
+        setOriginalUser(foundUser);
+        setFormData({
+          username: foundUser.username,
+          email: foundUser.email || "",
+          profile_image_url: foundUser.profile_image_url || "",
+          role: foundUser.role,
+        });
+      } else {
+        toast.error("User not found");
+        router.push("/admin/users");
       }
-    };
-
-    if (id) {
-      fetchUser();
     }
-  }, [id, router]);
+  }, [usersData, userId, router]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -138,31 +135,30 @@ export default function EditUserPage() {
     }
 
     try {
-      setIsSaving(true);
-
-      // In a real implementation, you would call an API endpoint
-      // await usersAPI.updateUserProfile(id, formData);
-
-      // Simulate successful update
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      // Use the update user profile mutation
+      await updateUserMutation.mutateAsync({
+        ...formData,
+      });
 
       toast.success("User updated successfully");
-      router.push(`/admin/users/${id}`);
+
+      // Invalidate queries to ensure data is refreshed
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+
+      router.push(`/admin/users/${userId}`);
     } catch (error) {
       console.error("Error updating user:", error);
       toast.error("Failed to update user");
-    } finally {
-      setIsSaving(false);
     }
   };
 
   const handleDelete = async () => {
     try {
-      // In a real implementation, you would call an API endpoint
-      // await usersAPI.deleteUser(id);
+      await deleteUserMutation.mutateAsync();
 
-      // Simulate successful deletion
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      // Invalidate the users query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ["users"] });
 
       toast.success("User deleted successfully");
       router.push("/admin/users");
@@ -187,7 +183,7 @@ export default function EditUserPage() {
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
           <Link
-            href={`/admin/users/${id}`}
+            href={`/admin/users/${userId}`}
             className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
           >
             <ArrowLeftIcon className="h-4 w-4 mr-1" />
@@ -421,7 +417,7 @@ export default function EditUserPage() {
 
               <div className="flex space-x-3">
                 <Link
-                  href={`/admin/users/${id}`}
+                  href={`/admin/users/${userId}`}
                   className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   Cancel
@@ -429,10 +425,10 @@ export default function EditUserPage() {
 
                 <button
                   type="submit"
-                  disabled={isSaving}
+                  disabled={updateUserMutation.isPending}
                   className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                 >
-                  {isSaving ? (
+                  {updateUserMutation.isPending ? (
                     <div className="flex items-center">
                       <div className="h-4 w-4 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2" />
                       Saving...
@@ -505,6 +501,7 @@ export default function EditUserPage() {
               <button
                 type="button"
                 onClick={handleDelete}
+                disabled={deleteUserMutation.isPending}
                 className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               >
                 Yes, Delete User

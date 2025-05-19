@@ -4,13 +4,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { badgesAPI } from "@/lib/api";
+import { useCreateBadge } from "@/lib/api";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
 export default function CreateBadgePage() {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [badgeData, setBadgeData] = useState({
     name: "",
     description: "",
@@ -19,6 +18,9 @@ export default function CreateBadgePage() {
     points: 0,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Use the createBadge mutation from React Query
+  const createBadgeMutation = useCreateBadge();
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -70,15 +72,19 @@ export default function CreateBadgePage() {
     }
 
     try {
-      setIsSubmitting(true);
-      await badgesAPI.createBadge(badgeData);
-      toast.success("Badge created successfully!");
-      router.push("/admin/badges");
+      await createBadgeMutation.mutateAsync(badgeData, {
+        onSuccess: () => {
+          toast.success("Badge created successfully!");
+          router.push("/admin/badges");
+        },
+        onError: (error) => {
+          console.error("Error creating badge:", error);
+          toast.error("Failed to create badge. Please try again.");
+        },
+      });
     } catch (error) {
       console.error("Error creating badge:", error);
       toast.error("Failed to create badge. Please try again.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -298,10 +304,10 @@ export default function CreateBadgePage() {
                 </Link>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={createBadgeMutation.isPending}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 disabled:opacity-50"
                 >
-                  {isSubmitting ? (
+                  {createBadgeMutation.isPending ? (
                     <div className="flex items-center">
                       <div className="h-4 w-4 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2" />
                       Creating...

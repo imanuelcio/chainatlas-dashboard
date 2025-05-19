@@ -1,52 +1,59 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { usersAPI } from "@/lib/api";
+import { useAllUsers, useAllBadges, usePublishedEvents } from "@/lib/api";
 import { User } from "@/types/user";
 import toast from "react-hot-toast";
 
 export default function AdminDashboardPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalEvents: 0,
-    totalBadges: 0,
-    activeUsers: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
+  // Fetch users data with React Query
+  const {
+    data: usersData,
+    isLoading: isLoadingUsers,
+    isError: isErrorUsers,
+  } = useAllUsers();
 
-  useEffect(() => {
-    const fetchAdminData = async () => {
-      setIsLoading(true);
-      try {
-        // Fetch all users
-        const usersResponse = await usersAPI.getAllUsers();
-        setUsers(usersResponse.users);
+  // Fetch events data with React Query
+  const {
+    data: eventsData,
+    isLoading: isLoadingEvents,
+    isError: isErrorEvents,
+  } = usePublishedEvents({ limit: 100 }); // Get all events for counting
 
-        // Calculate stats
-        const totalUsers = usersResponse.users.length;
-        const activeUsers = usersResponse.users.filter(
-          (user) => user.total_achievements > 0
-        ).length;
+  // Fetch badges data with React Query
+  const {
+    data: badgesData,
+    isLoading: isLoadingBadges,
+    isError: isErrorBadges,
+  } = useAllBadges();
 
-        setStats({
-          totalUsers,
-          totalEvents: 0, // This would come from a separate API call
-          totalBadges: 0, // This would come from a separate API call
-          activeUsers,
-        });
-      } catch (error) {
-        console.error("Error fetching admin data:", error);
-        toast.error("Failed to load admin dashboard data");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Extract data from responses
+  const users: User[] = usersData?.users || [];
+  const totalEvents = eventsData?.events?.length || 0;
+  const totalBadges = badgesData?.badges?.length || 0;
 
-    fetchAdminData();
-  }, []);
+  // Calculate stats
+  const totalUsers = users.length;
+  const activeUsers = users.filter(
+    (user) => user.total_achievements > 0
+  ).length;
+
+  const stats = {
+    totalUsers,
+    totalEvents,
+    totalBadges,
+    activeUsers,
+  };
+
+  // Handle errors
+  if (isErrorUsers || isErrorEvents || isErrorBadges) {
+    toast.error("Failed to load admin dashboard data");
+  }
+
+  // Overall loading state
+  const isLoading = isLoadingUsers || isLoadingEvents || isLoadingBadges;
 
   if (isLoading) {
     return (
@@ -134,8 +141,10 @@ export default function AdminDashboardPage() {
           <div className="mt-4">
             <div className="text-sm text-gray-500 dark:text-gray-400">
               <p>
-                {Math.round((stats.activeUsers / stats.totalUsers) * 100)}% of
-                all users
+                {totalUsers > 0
+                  ? Math.round((stats.activeUsers / stats.totalUsers) * 100)
+                  : 0}
+                % of all users
               </p>
             </div>
           </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { walletAuth, discordAuth } from "../../../lib/auth";
+import { walletAuth } from "../../../lib/auth";
 import toast from "react-hot-toast";
 import { loginWithDiscord } from "@/lib/api";
 import Image from "next/image";
@@ -21,6 +21,9 @@ export default function LoginPage() {
         router.push("/dashboard");
       } else if (authResult && authResult.error) {
         toast.error(authResult.error);
+      } else if (!authResult) {
+        // If wallet connection was cancelled or failed
+        toast.error("Wallet connection failed or cancelled");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -33,8 +36,8 @@ export default function LoginPage() {
   const handleDiscordLogin = () => {
     setIsLoading(true);
     try {
+      // Using the direct function from api.ts
       loginWithDiscord();
-      // discordAuth();
       // Note: This will redirect to Discord, so we don't need to handle success case here
     } catch (error) {
       console.error("Discord login error:", error);

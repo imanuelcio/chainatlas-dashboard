@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { User } from "@/types/user";
-import { authAPI, usersAPI } from "@/lib/api";
-import toast from "react-hot-toast";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -17,33 +15,33 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   console.log(user);
-  useEffect(() => {
-    const fetchProfile = async () => {
-      setIsLoading(true);
-      try {
-        const profileResponse = await usersAPI.getUserProfile();
+  // useEffect(() => {
+  //   const fetchProfile = async () => {
+  //     setIsLoading(true);
+  //     try {
+  //       const profileResponse = await usersAPI.getUserProfile();
 
-        // Periksa apakah respons mengandung user atau profile
-        const profileData = profileResponse.profile || profileResponse.user;
+  //       // Periksa apakah respons mengandung user atau profile
+  //       const profileData = profileResponse.profile || profileResponse.user;
 
-        if (profileData) {
-          setUser(profileData);
-          // Initialize form data with current profile values
-        } else {
-          throw new Error("Profile data not found in response");
-        }
+  //       if (profileData) {
+  //         setUser(profileData);
+  //         // Initialize form data with current profile values
+  //       } else {
+  //         throw new Error("Profile data not found in response");
+  //       }
 
-        console.log("Profile response:", profileResponse);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-        toast.error("Failed to load profile data");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  //       console.log("Profile response:", profileResponse);
+  //     } catch (error) {
+  //       console.error("Error fetching profile:", error);
+  //       toast.error("Failed to load profile data");
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-    fetchProfile();
-  }, []);
+  //   fetchProfile();
+  // }, []);
 
   const isActive = (path: string) => {
     return (
@@ -133,7 +131,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </Link>
           ))}
 
-          {user && user.role === "admin" && (
+          {/* {user && user.role === "admin" && (
             <>
               <div className="pt-4 pb-2">
                 <p className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -141,7 +139,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </p>
               </div>
 
-              {/* Admin Dashboard */}
               <Link
                 href="/admin"
                 className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
@@ -177,7 +174,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 Overview
               </Link>
 
-              {/* Users Management */}
               <Link
                 href="/admin/users"
                 className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
@@ -207,7 +203,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 Users
               </Link>
 
-              {/* Badges Management */}
               <Link
                 href="/admin/badges"
                 className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
@@ -237,7 +232,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 Badges
               </Link>
 
-              {/* Events Management */}
               <Link
                 href="/admin/events"
                 className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
@@ -266,9 +260,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </svg>
                 Events
               </Link>
-
-              {/* Stats & Analytics */}
-              {/* <Link
+              <Link
                 href="/admin/stats"
                 className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
                   isActive("/admin/stats")
@@ -295,10 +287,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   />
                 </svg>
                 Analytics
-              </Link> */}
+              </Link>
 
-              {/* Settings */}
-              {/* <Link
+              <Link
                 href="/admin/settings"
                 className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
                   isActive("/admin/settings")
@@ -325,9 +316,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   />
                 </svg>
                 Settings
-              </Link> */}
+              </Link>
             </>
-          )}
+          )} */}
         </nav>
 
         {/* Version info at bottom of sidebar */}
@@ -402,11 +393,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               >
                 <span className="sr-only">Open user menu</span>
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-white">
-                  {user?.username ? user.username[0].toUpperCase() : "U"}
+                  {user?.username ? user.username[0].toUpperCase() : ""}
                 </div>
-                <span className="ml-2 text-sm font-medium text-gray-300">
+                {/* <span className="ml-2 text-sm font-medium text-gray-300">
                   {user?.username || "Loading..."}
-                </span>
+                </span> */}
                 <svg
                   className="ml-1 h-4 w-4 text-gray-400"
                   xmlns="http://www.w3.org/2000/svg"

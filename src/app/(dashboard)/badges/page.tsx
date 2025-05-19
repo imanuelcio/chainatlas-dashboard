@@ -1,51 +1,52 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { badgesAPI, usersAPI } from "@/lib/api";
 import toast from "react-hot-toast";
 import { Badge } from "@/types/badges";
+import { useAllBadges, useUserBadges } from "@/lib/api"; // Import our React Query hooks
 
+// Updated type definition to match the actual API response
 type UserBadge = {
-  id: string;
+  _id: string;
   earned_at: string;
-  badge: Badge;
+  badge_id: Badge; // Badge data is nested under badge_id
 };
 
 export default function BadgesPage() {
-  const [allBadges, setAllBadges] = useState<Badge[]>([]);
-  const [userBadges, setUserBadges] = useState<UserBadge[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"all" | "earned">("all");
 
+  // Use React Query hooks
+  const {
+    data: allBadgesData,
+    isLoading: isLoadingAllBadges,
+    isError: isErrorAllBadges,
+  } = useAllBadges();
+
+  const {
+    data: userBadgesData,
+    isLoading: isLoadingUserBadges,
+    isError: isErrorUserBadges,
+  } = useUserBadges();
+
+  // Handle loading states
+  const isLoading = isLoadingAllBadges || isLoadingUserBadges;
+
+  // Handle error states
+  if (isErrorAllBadges || isErrorUserBadges) {
+    toast.error("Failed to load badges");
+  }
+
+  // Process data once it's available
+  const allBadges = allBadgesData?.badges || [];
+  const userBadges = userBadgesData?.badges || [];
+
   // Get unique badge categories
   const categories = [
-    ...new Set(allBadges.map((badge) => badge.category)),
+    ...new Set(allBadges.map((badge) => badge.category).filter(Boolean)),
   ].sort();
-
-  useEffect(() => {
-    const fetchBadges = async () => {
-      setIsLoading(true);
-      try {
-        // Fetch all badges
-        const allBadgesResponse = await badgesAPI.getAllBadges();
-        setAllBadges(allBadgesResponse.badges);
-
-        // Fetch user badges
-        const userBadgesResponse = await usersAPI.getUserBadges();
-        setUserBadges(userBadgesResponse.badges);
-      } catch (error) {
-        console.error("Error fetching badges:", error);
-        toast.error("Failed to load badges");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchBadges();
-  }, []);
 
   // Filter badges by category
   const filteredBadges = filter
@@ -53,11 +54,13 @@ export default function BadgesPage() {
     : allBadges;
 
   // Get user's earned badge IDs for easier lookup
-  const earnedBadgeIds = userBadges.map((item) => item.badge.id);
+  const earnedBadgeIds = userBadges
+    .filter((item) => item.badge_id) // Ensure badge_id exists
+    .map((item) => item.badge_id._id);
 
   // Filter earned badges for "Earned" tab
   const earnedBadges = userBadges.filter((item) =>
-    filter ? item.badge.category === filter : true
+    filter ? item.badge_id?.category === filter : true
   );
 
   return (
@@ -128,15 +131,15 @@ export default function BadgesPage() {
         filteredBadges.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredBadges.map((badge) => {
-              const isEarned = earnedBadgeIds.includes(badge.id);
+              const isEarned = earnedBadgeIds.includes(badge._id);
               const userBadge = userBadges.find(
-                (item) => item.badge.id === badge.id
+                (item) => item.badge_id?._id === badge._id
               );
 
               return (
                 <Link
-                  href={`/badges/${badge.id}`}
-                  key={badge.id}
+                  href={`/badges/${badge._id}`}
+                  key={badge._id}
                   className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow relative"
                 >
                   {isEarned && (
@@ -168,7 +171,7 @@ export default function BadgesPage() {
                       ) : (
                         <div className="h-full w-full flex items-center justify-center bg-blue-100 dark:bg-blue-900">
                           <span className="text-blue-700 dark:text-blue-300 font-bold text-3xl">
-                            {/* {badge.name.charAt(0)} */}
+                            {badge.name ? badge.name.charAt(0) : "B"}
                           </span>
                         </div>
                       )}
@@ -201,7 +204,7 @@ export default function BadgesPage() {
                         {badge.points} points
                       </span>
                     </div>
-                    {isEarned && (
+                    {isEarned && userBadge && (
                       <div className="flex items-center mt-2 text-blue-500">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -219,9 +222,9 @@ export default function BadgesPage() {
                         </svg>
                         <span className="text-xs">
                           Earned on{" "}
-                          {new Date(
-                            userBadge?.earned_at || ""
-                          ).toLocaleDateString()}
+                          {userBadge.earned_at
+                            ? new Date(userBadge.earned_at).toLocaleDateString()
+                            : "Unknown date"}
                         </span>
                       </div>
                     )}
@@ -268,75 +271,81 @@ export default function BadgesPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {earnedBadges.map((userBadge) => (
             <Link
-              href={`/badges/${userBadge.badge.id}`}
-              key={userBadge.id}
+              href={`/badges/${userBadge.badge_id?._id || ""}`}
+              key={userBadge._id}
               className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow"
             >
-              <div className="p-6 flex flex-col items-center">
-                <div className="h-28 w-28 rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden mb-4">
-                  {userBadge.badge.image_url ? (
-                    <img
-                      src={userBadge.badge.image_url}
-                      alt={userBadge.badge.name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="h-full w-full flex items-center justify-center bg-blue-100 dark:bg-blue-900">
-                      <span className="text-blue-700 dark:text-blue-300 font-bold text-3xl">
-                        {/* {userBadge.badge.name.charAt(0)} */}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <h3 className="font-semibold text-lg text-center mb-1">
-                  {userBadge.badge.name}
-                </h3>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 mb-2">
-                  {userBadge.badge.category}
-                </span>
-                <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-3 line-clamp-3">
-                  {userBadge.badge.description}
-                </p>
-                <div className="flex items-center mt-auto">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 mr-1 text-yellow-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <span className="text-sm font-medium">
-                    {userBadge.badge.points} points
+              {userBadge.badge_id && (
+                <div className="p-6 flex flex-col items-center">
+                  <div className="h-28 w-28 rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden mb-4">
+                    {userBadge.badge_id.image_url ? (
+                      <img
+                        src={userBadge.badge_id.image_url}
+                        alt={userBadge.badge_id.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center bg-blue-100 dark:bg-blue-900">
+                        <span className="text-blue-700 dark:text-blue-300 font-bold text-3xl">
+                          {userBadge.badge_id.name
+                            ? userBadge.badge_id.name.charAt(0)
+                            : "B"}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="font-semibold text-lg text-center mb-1">
+                    {userBadge.badge_id.name}
+                  </h3>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 mb-2">
+                    {userBadge.badge_id.category}
                   </span>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-3 line-clamp-3">
+                    {userBadge.badge_id.description}
+                  </p>
+                  <div className="flex items-center mt-auto">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1 text-yellow-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <span className="text-sm font-medium">
+                      {userBadge.badge_id.points} points
+                    </span>
+                  </div>
+                  <div className="flex items-center mt-2 text-blue-500">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <span className="text-xs">
+                      Earned on{" "}
+                      {userBadge.earned_at
+                        ? new Date(userBadge.earned_at).toLocaleDateString()
+                        : "Unknown date"}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center mt-2 text-blue-500">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 mr-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <span className="text-xs">
-                    Earned on{" "}
-                    {new Date(userBadge.earned_at).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
+              )}
             </Link>
           ))}
         </div>

@@ -1,19 +1,16 @@
 // src/app/(dashboard)/admin/events/new/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { eventsAPI, badgesAPI } from "@/lib/api";
+import { useCreateEvent, useAllBadges } from "@/lib/api";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { Badge } from "@/types/badges";
 
 export default function CreateEventPage() {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [badges, setBadges] = useState<Badge[]>([]);
-  const [isLoadingBadges, setIsLoadingBadges] = useState(true);
   const [eventData, setEventData] = useState({
     title: "",
     description: "",
@@ -31,23 +28,23 @@ export default function CreateEventPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    // Fetch badges for reward selection
-    const fetchBadges = async () => {
-      try {
-        setIsLoadingBadges(true);
-        const response = await badgesAPI.getAllBadges();
-        setBadges(response.badges || []);
-      } catch (error) {
-        console.error("Error fetching badges:", error);
-        toast.error("Failed to load badges for rewards");
-      } finally {
-        setIsLoadingBadges(false);
-      }
-    };
+  // Use React Query to fetch badges
+  const {
+    data: badgesData,
+    isLoading: isLoadingBadges,
+    isError: isErrorBadges,
+  } = useAllBadges();
 
-    fetchBadges();
-  }, []);
+  // Extract badges from response
+  const badges: Badge[] = badgesData?.badges || [];
+
+  // Use createEvent mutation
+  const createEventMutation = useCreateEvent();
+
+  // Handle errors for badge fetching
+  if (isErrorBadges) {
+    toast.error("Failed to load badges for rewards");
+  }
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -133,15 +130,19 @@ export default function CreateEventPage() {
     }
 
     try {
-      setIsSubmitting(true);
-      const response = await eventsAPI.createEvent(eventData);
-      toast.success("Event created successfully!");
-      router.push("/admin/events");
+      await createEventMutation.mutateAsync(eventData, {
+        onSuccess: () => {
+          toast.success("Event created successfully!");
+          router.push("/admin/events");
+        },
+        onError: (error) => {
+          console.error("Error creating event:", error);
+          toast.error("Failed to create event. Please try again.");
+        },
+      });
     } catch (error) {
       console.error("Error creating event:", error);
       toast.error("Failed to create event. Please try again.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -171,7 +172,6 @@ export default function CreateEventPage() {
             href="/admin/events"
             className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
           >
-            {/* <ArrowLeftIcon className="h-4 w-4 mr-1" /> */}
             Back to Events
           </Link>
         </div>
@@ -179,7 +179,6 @@ export default function CreateEventPage() {
         <div className="md:flex md:items-center md:justify-between mb-6">
           <div className="flex-1 min-w-0">
             <h2 className="text-2xl font-bold leading-7 text-white sm:text-3xl sm:truncate flex items-center">
-              {/* <CalendarIcon className="h-8 w-8 mr-3 text-blue-500" /> */}
               Create New Event
             </h2>
             <p className="mt-1 text-sm text-gray-500">
@@ -501,8 +500,8 @@ export default function CreateEventPage() {
                         Loading badges...
                       </option>
                     ) : (
-                      badges.map((badge: any) => (
-                        <option key={badge._id} value={badge._id}>
+                      badges.map((badge) => (
+                        <option key={badge.id} value={badge.id}>
                           {badge.name}
                         </option>
                       ))
@@ -568,10 +567,10 @@ export default function CreateEventPage() {
                 </Link>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={createEventMutation.isPending}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 disabled:opacity-50"
                 >
-                  {isSubmitting ? (
+                  {createEventMutation.isPending ? (
                     <div className="flex items-center">
                       <div className="h-4 w-4 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2" />
                       Creating...

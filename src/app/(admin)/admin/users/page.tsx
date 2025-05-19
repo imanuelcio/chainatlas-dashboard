@@ -1,9 +1,9 @@
 // src/app/(dashboard)/admin/users/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { usersAPI } from "@/lib/api";
+import { useAllUsers } from "@/lib/api";
 import {
   UserIcon,
   PencilIcon,
@@ -18,7 +18,7 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 
 type User = {
-  _id: string;
+  id: string;
   username: string;
   email: string;
   wallet_address: string;
@@ -30,8 +30,6 @@ type User = {
 };
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<"all" | "user" | "admin">("all");
   const [sortBy, setSortBy] = useState<
@@ -39,25 +37,19 @@ export default function AdminUsersPage() {
   >("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const fetchUsers = async () => {
-    try {
-      setIsLoading(true);
-      const response = await usersAPI.getAllUsers();
-      setUsers(response.users || []);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      toast.error("Failed to load users");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Fetch users with React Query
+  const { data: usersData, isLoading, isError, refetch } = useAllUsers();
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  // Handle errors
+  if (isError) {
+    toast.error("Failed to load users");
+  }
+
+  // Extract users from response
+  const users: User[] = usersData?.users || [];
 
   const handleRefresh = () => {
-    fetchUsers();
+    refetch();
   };
 
   const handleSort = (
@@ -251,9 +243,9 @@ export default function AdminUsersPage() {
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {sortedUsers.length > 0 ? (
-                    sortedUsers.map((user) => (
+                    sortedUsers.map((user, i) => (
                       <tr
-                        key={user._id}
+                        key={i}
                         className="hover:bg-gray-50 dark:hover:bg-gray-700"
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -344,13 +336,13 @@ export default function AdminUsersPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <Link
-                            href={`/admin/users/${user._id}`}
+                            href={`/admin/users/${user.id}`}
                             className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mr-4"
                           >
                             View
                           </Link>
                           <Link
-                            href={`/admin/users/${user._id}/edit`}
+                            href={`/admin/users/${user.id}/edit`}
                             className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
                           >
                             Edit

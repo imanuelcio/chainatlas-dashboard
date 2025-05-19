@@ -1,4 +1,5 @@
 export interface Badge {
+  _id: any;
   id: string;
   name: string;
   description: string;

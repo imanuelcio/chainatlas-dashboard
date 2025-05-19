@@ -1,12 +1,16 @@
 // src/app/(dashboard)/leaderboard/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { usersAPI } from "@/lib/api";
-
+import { useLeaderboard } from "@/lib/api";
+import {
+  FireIcon,
+  TrophyIcon,
+  CalendarIcon,
+  UserGroupIcon,
+} from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
-import Image from "next/image";
 
 type LeaderboardItem = {
   _id: string;
@@ -26,31 +30,17 @@ export default function LeaderboardPage() {
   const [activeTab, setActiveTab] = useState<"points" | "badges" | "events">(
     "points"
   );
-  const [leaderboard, setLeaderboard] = useState<LeaderboardItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [limit, setLimit] = useState(10);
 
-  const fetchLeaderboard = async (type: string, limit: number) => {
-    try {
-      setIsLoading(true);
-      const response = await usersAPI.getLeaderboard(limit);
+  // Use React Query for data fetching
+  const { data, isLoading, refetch } = useLeaderboard(limit);
 
-      // Use the API response
-      setLeaderboard(response.leaderboard || []);
-    } catch (error) {
-      console.error("Error fetching leaderboard:", error);
-      toast.error("Failed to load leaderboard data");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchLeaderboard(activeTab, limit);
-  }, [activeTab, limit]);
+  const leaderboard: LeaderboardItem[] = data?.leaderboard || [];
 
   const handleTabChange = (type: "points" | "badges" | "events") => {
     setActiveTab(type);
+    // In a real implementation, you might want to call a different endpoint based on the tab
+    // For now, we'll just use the existing leaderboard data
   };
 
   const handleLoadMore = () => {
@@ -87,7 +77,7 @@ export default function LeaderboardPage() {
         <div className="md:flex md:items-center md:justify-between mb-6">
           <div className="flex-1 min-w-0">
             <h2 className="text-2xl font-bold leading-7 text-white sm:text-3xl sm:truncate flex items-center">
-              {/* <TrophyIcon className="h-8 w-8 mr-3 text-yellow-500" /> */}
+              <TrophyIcon className="h-8 w-8 mr-3 text-yellow-500" />
               Community Leaderboard
             </h2>
             <p className="mt-1 text-sm text-gray-500">
@@ -107,7 +97,7 @@ export default function LeaderboardPage() {
                     : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                 }`}
               >
-                {/* <FireIcon className="h-5 w-5 mr-2" /> */}
+                <FireIcon className="h-5 w-5 mr-2" />
                 Points Leaders
               </button>
               <button
@@ -118,7 +108,7 @@ export default function LeaderboardPage() {
                     : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                 }`}
               >
-                {/* <TrophyIcon className="h-5 w-5 mr-2" /> */}
+                <TrophyIcon className="h-5 w-5 mr-2" />
                 Badge Collectors
               </button>
               <button
@@ -129,7 +119,7 @@ export default function LeaderboardPage() {
                     : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                 }`}
               >
-                {/* <CalendarIcon className="h-5 w-5 mr-2" /> */}
+                <CalendarIcon className="h-5 w-5 mr-2" />
                 Event Participants
               </button>
             </div>
@@ -181,12 +171,13 @@ export default function LeaderboardPage() {
                                 className="h-full w-full object-cover"
                                 onError={(e) => {
                                   (e.target as HTMLImageElement).onerror = null;
-                                  (e.target as HTMLImageElement).src = "";
+                                  (e.target as HTMLImageElement).src =
+                                    "/default-avatar.png";
                                 }}
                               />
                             ) : (
                               <div className="h-full w-full flex items-center justify-center">
-                                {/* <UserGroupIcon className="h-6 w-6 text-gray-500 dark:text-gray-400" /> */}
+                                <UserGroupIcon className="h-6 w-6 text-gray-500 dark:text-gray-400" />
                               </div>
                             )}
                           </div>
@@ -237,7 +228,7 @@ export default function LeaderboardPage() {
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow p-6">
             <h3 className="font-semibold mb-2 text-gray-900 dark:text-white flex items-center">
-              {/* <FireIcon className="h-5 w-5 mr-2 text-orange-500" /> */}
+              <FireIcon className="h-5 w-5 mr-2 text-orange-500" />
               Points System
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -300,7 +291,7 @@ export default function LeaderboardPage() {
 
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow p-6">
             <h3 className="font-semibold mb-2 text-gray-900 dark:text-white flex items-center">
-              {/* <TrophyIcon className="h-5 w-5 mr-2 text-yellow-500" /> */}
+              <TrophyIcon className="h-5 w-5 mr-2 text-yellow-500" />
               Badges Collection
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -363,7 +354,7 @@ export default function LeaderboardPage() {
 
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow p-6">
             <h3 className="font-semibold mb-2 text-gray-900 dark:text-white flex items-center">
-              {/* <CalendarIcon className="h-5 w-5 mr-2 text-blue-500" /> */}
+              <CalendarIcon className="h-5 w-5 mr-2 text-blue-500" />
               Event Participation
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">

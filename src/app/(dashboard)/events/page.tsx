@@ -1,41 +1,37 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { eventsAPI } from "@/lib/api";
+import { usePublishedEvents } from "@/lib/api";
 import { Event } from "@/types/event";
 import toast from "react-hot-toast";
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [filter, setFilter] = useState<string>("");
 
-  const fetchEvents = async (pageNum: number, eventType?: string) => {
-    setIsLoading(true);
-    try {
-      const response = await eventsAPI.getAllPublishedEvents({
-        page: pageNum,
-        limit: 8,
-        type: eventType || undefined,
-      });
+  // Use React Query to fetch events with pagination and filtering
+  const {
+    data: eventsData,
+    isLoading,
+    isError,
+    error,
+  } = usePublishedEvents({
+    page,
+    limit: 8,
+    type: filter || undefined,
+  });
 
-      setEvents(response.events);
-      setTotalPages(response.pagination.pages);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      toast.error("Failed to load events");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Extract events and pagination data
+  const events: Event[] = eventsData?.events || [];
+  const totalPages = eventsData?.pagination?.pages || 1;
 
-  useEffect(() => {
-    fetchEvents(page, filter);
-  }, [page, filter]);
+  // Handle errors
+  if (isError) {
+    toast.error("Failed to load events");
+    console.error("Error fetching events:", error);
+  }
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFilter(e.target.value);

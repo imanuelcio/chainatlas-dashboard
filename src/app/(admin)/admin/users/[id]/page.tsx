@@ -4,7 +4,14 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { usersAPI, badgesAPI } from "@/lib/api";
+import {
+  useAllUsers,
+  useUserBadges,
+  useUserEvents,
+  useUserStats,
+  useUpdateUserProfile,
+  useAwardBadgeToUser,
+} from "@/lib/api";
 import {
   UserIcon,
   ArrowLeftIcon,
@@ -72,11 +79,9 @@ type UserStats = {
 export default function UserDetailsPage() {
   const router = useRouter();
   const { id } = useParams();
+  const userId = Array.isArray(id) ? id[0] : id;
+
   const [user, setUser] = useState<User | null>(null);
-  const [userBadges, setUserBadges] = useState<UserBadge[]>([]);
-  const [userEvents, setUserEvents] = useState<UserEvent[]>([]);
-  const [userStats, setUserStats] = useState<UserStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -85,54 +90,34 @@ export default function UserDetailsPage() {
     role: "user" as "user" | "admin",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSaving, setIsSaving] = useState(false);
+
+  // Fetch user data with React Query
+  const { data: usersData, isLoading: isLoadingUsers } = useAllUsers();
+  const { data: badgesData } = useUserBadges();
+  const { data: eventsData } = useUserEvents();
+  const { data: statsData } = useUserStats();
+
+  // Update user mutation
+  const updateUserMutation = useUpdateUserProfile();
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        setIsLoading(true);
+    if (usersData?.users && userId) {
+      const foundUser = usersData.users.find((u: User) => u._id === userId);
 
-        // In a real implementation, you would have API endpoints to fetch user details
-        // For now, let's simulate with the existing API
-        const userResponse = await usersAPI.getAllUsers();
-        const foundUser = userResponse.users.find((u: User) => u._id === id);
-
-        if (foundUser) {
-          setUser(foundUser);
-          setFormData({
-            username: foundUser.username,
-            email: foundUser.email || "",
-            profile_image_url: foundUser.profile_image_url || "",
-            role: foundUser.role,
-          });
-
-          // Fetch user badges
-          const badgesResponse = await badgesAPI.getAllBadges();
-          setUserBadges(badgesResponse.badges || []);
-
-          // Fetch user events if you have an endpoint for this
-          // const eventsResponse = await usersAPI.getUserEvents();
-          // setUserEvents(eventsResponse.events || []);
-
-          // Fetch user stats if you have an endpoint for this
-          // const statsResponse = await usersAPI.getUserStats();
-          // setUserStats(statsResponse.stats || null);
-        } else {
-          toast.error("User not found");
-          router.push("/admin/users");
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        toast.error("Failed to load user data");
-      } finally {
-        setIsLoading(false);
+      if (foundUser) {
+        setUser(foundUser);
+        setFormData({
+          username: foundUser.username,
+          email: foundUser.email || "",
+          profile_image_url: foundUser.profile_image_url || "",
+          role: foundUser.role,
+        });
+      } else {
+        toast.error("User not found");
+        router.push("/admin/users");
       }
-    };
-
-    if (id) {
-      fetchUserData();
     }
-  }, [id, router]);
+  }, [usersData, userId, router]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -174,13 +159,13 @@ export default function UserDetailsPage() {
     }
 
     try {
-      setIsSaving(true);
-
-      // In a real implementation, you would call an API to update the user
-      // const response = await usersAPI.updateUser(id, formData);
-
-      // Simulate successful update
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Use the mutation to update user profile
+      await updateUserMutation.mutateAsync({
+        username: formData.username,
+        email: formData.email,
+        profile_image_url: formData.profile_image_url,
+        role: formData.role,
+      });
 
       // Update the user state with the new data
       if (user) {
@@ -195,8 +180,6 @@ export default function UserDetailsPage() {
     } catch (error) {
       console.error("Error updating user:", error);
       toast.error("Failed to update user");
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -216,7 +199,16 @@ export default function UserDetailsPage() {
     setIsEditing(!isEditing);
   };
 
-  if (isLoading) {
+  // Get user badges from the badgesData
+  const userBadges: UserBadge[] = badgesData?.badges || [];
+
+  // Get user events from the eventsData
+  const userEvents: UserEvent[] = eventsData?.events || [];
+
+  // Get user stats from the statsData
+  const userStats: UserStats | null = statsData?.stats || null;
+
+  if (isLoadingUsers) {
     return (
       <DashboardLayout>
         <div className="flex justify-center my-12">
@@ -400,10 +392,10 @@ export default function UserDetailsPage() {
                   </button>
                   <button
                     type="submit"
-                    disabled={isSaving}
+                    disabled={updateUserMutation.isPending}
                     className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                   >
-                    {isSaving ? (
+                    {updateUserMutation.isPending ? (
                       <div className="flex items-center">
                         <div className="h-4 w-4 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2" />
                         Saving...
@@ -579,7 +571,7 @@ export default function UserDetailsPage() {
                 Badges Earned
               </h3>
               <Link
-                href={`/admin/users/${id}/badges`}
+                href={`/admin/users/${userId}/badges`}
                 className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
               >
                 View All
@@ -629,7 +621,7 @@ export default function UserDetailsPage() {
               {userBadges.length > 4 && (
                 <div className="mt-4 text-center">
                   <Link
-                    href={`/admin/users/${id}/badges`}
+                    href={`/admin/users/${userId}/badges`}
                     className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                   >
                     View {userBadges.length - 4} more badges
@@ -640,7 +632,7 @@ export default function UserDetailsPage() {
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex justify-between">
                   <Link
-                    href={`/admin/users/${id}/award-badge`}
+                    href={`/admin/users/${userId}/award-badge`}
                     className="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                   >
                     <PlusIcon className="h-4 w-4 mr-1" />
@@ -660,7 +652,7 @@ export default function UserDetailsPage() {
               Recent Events
             </h3>
             <Link
-              href={`/admin/users/${id}/events`}
+              href={`/admin/users/${userId}/events`}
               className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
             >
               View All

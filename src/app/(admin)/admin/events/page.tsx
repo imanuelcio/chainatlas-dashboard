@@ -1,52 +1,54 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { eventsAPI } from "@/lib/api";
+import { usePublishedEvents, useDeleteEvent } from "@/lib/api";
 import { Event } from "@/types/event";
 import toast from "react-hot-toast";
 
 export default function AdminEventsPage() {
   const router = useRouter();
-  const [events, setEvents] = useState<Event[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState<string | null>(
     null
   );
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      setIsLoading(true);
-      try {
-        // In a real implementation, we would use an admin-specific API
-        // For now, we'll use the public API
-        const response = await eventsAPI.getAllPublishedEvents({ limit: 100 });
-        setEvents(response.events);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-        toast.error("Failed to load events");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Fetch events with React Query
+  const {
+    data: eventsData,
+    isLoading,
+    isError,
+    refetch,
+  } = usePublishedEvents({ limit: 100 });
 
-    fetchEvents();
-  }, []);
+  // Use delete event mutation
+  const deleteEventMutation = useDeleteEvent();
+
+  // Handle errors
+  if (isError) {
+    toast.error("Failed to load events");
+  }
+
+  // Extract events from response
+  const events: Event[] = eventsData?.events || [];
 
   const handleDeleteEvent = async (eventId: string) => {
-    setIsDeleting(eventId);
     try {
-      await eventsAPI.deleteEvent(eventId);
-      setEvents(events.filter((event) => event.id !== eventId));
-      toast.success("Event deleted successfully");
+      await deleteEventMutation.mutateAsync(eventId, {
+        onSuccess: () => {
+          toast.success("Event deleted successfully");
+          refetch(); // Refresh the event list after deletion
+        },
+        onError: (error) => {
+          console.error("Error deleting event:", error);
+          toast.error("Failed to delete event");
+        },
+      });
     } catch (error) {
       console.error("Error deleting event:", error);
       toast.error("Failed to delete event");
     } finally {
-      setIsDeleting(null);
       setShowConfirmDelete(null);
     }
   };
@@ -242,10 +244,11 @@ export default function AdminEventsPage() {
                             <div className="flex items-center space-x-2">
                               <button
                                 onClick={() => handleDeleteEvent(event.id)}
-                                disabled={isDeleting === event.id}
+                                disabled={deleteEventMutation.isPending}
                                 className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                               >
-                                {isDeleting === event.id
+                                {deleteEventMutation.isPending &&
+                                deleteEventMutation.variables === event.id
                                   ? "Deleting..."
                                   : "Confirm"}
                               </button>

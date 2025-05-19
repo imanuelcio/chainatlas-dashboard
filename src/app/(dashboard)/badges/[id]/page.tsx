@@ -1,72 +1,64 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { badgesAPI, usersAPI } from "@/lib/api";
 import toast from "react-hot-toast";
 import { Badge } from "@/types/badges";
+import { useBadge, useUserBadges, useAllBadges } from "@/lib/api";
 
 export default function BadgeDetailPage() {
   const router = useRouter();
-  const [badge, setBadge] = useState<Badge | null>(null);
-  const [relatedBadges, setRelatedBadges] = useState<Badge[]>([]);
-  const [isEarned, setIsEarned] = useState(false);
-  const [earnedDate, setEarnedDate] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingRelated, setIsLoadingRelated] = useState(true);
   const params = useParams() as { id: string };
-  useEffect(() => {
-    const fetchBadge = async () => {
-      setIsLoading(true);
-      try {
-        const badgeResponse = await badgesAPI.getBadgeById(params.id);
-        setBadge(badgeResponse.badge);
+  const badgeId = params.id;
 
-        const userBadgesResponse = await usersAPI.getUserBadges();
-        const earnedBadge = userBadgesResponse.badges.find(
-          (item) => item.badge.id === params.id
-        );
+  // Fetch badge details using React Query
+  const {
+    data: badgeData,
+    isLoading: isLoadingBadge,
+    isError: isErrorBadge,
+  } = useBadge(badgeId);
 
-        if (earnedBadge) {
-          setIsEarned(true);
-          setEarnedDate(earnedBadge.earned_at);
-        }
-      } catch (error) {
-        console.error("Error fetching badge details:", error);
-        toast.error("Failed to load badge details");
-        router.push("/badges");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Fetch user badges to check if this badge is earned
+  const {
+    data: userBadgesData,
+    isLoading: isLoadingUserBadges,
+    isError: isErrorUserBadges,
+  } = useUserBadges();
 
-    fetchBadge();
-  }, [params.id, router]);
+  // Extract badge from response data
+  const badge: Badge | null = badgeData?.badge || null;
 
-  useEffect(() => {
-    const fetchRelatedBadges = async () => {
-      if (!badge) return;
-      setIsLoadingRelated(true);
-      try {
-        const response = await badgesAPI.getAllBadges(badge.category);
-        const filtered = response.badges
-          .filter((b) => b.id !== badge.id)
-          .slice(0, 3);
-        setRelatedBadges(filtered);
-      } catch (error) {
-        console.error("Error fetching related badges:", error);
-      } finally {
-        setIsLoadingRelated(false);
-      }
-    };
+  // Check if badge is earned and get earned date
+  const userBadges = userBadgesData?.badges || [];
+  // Use _id instead of id to match MongoDB document structure
+  const earnedBadge = userBadges.find((item) => item.badge_id?._id === badgeId);
+  const isEarned = !!earnedBadge;
+  const earnedDate = earnedBadge?.earned_at || null;
 
-    if (badge) {
-      fetchRelatedBadges();
-    }
-  }, [badge]);
+  // Fetch related badges in the same category
+  const {
+    data: relatedBadgesData,
+    isLoading: isLoadingRelated,
+    isError: isErrorRelated,
+  } = useAllBadges(badge?.category);
 
+  const relatedBadges = badge
+    ? (relatedBadgesData?.badges || [])
+        // Use _id instead of id for comparison
+        .filter((b) => b._id !== badge._id)
+        .slice(0, 3)
+    : [];
+
+  // Handle errors
+  if (isErrorBadge) {
+    toast.error("Failed to load badge details");
+    router.push("/badges");
+    return null;
+  }
+
+  // Loading state
+  const isLoading = isLoadingBadge || isLoadingUserBadges;
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -77,6 +69,7 @@ export default function BadgeDetailPage() {
     );
   }
 
+  // Badge not found
   if (!badge) {
     return (
       <DashboardLayout>
@@ -133,7 +126,7 @@ export default function BadgeDetailPage() {
                 ) : (
                   <div className="h-full w-full flex items-center justify-center bg-primary-200">
                     <span className="text-primary-700 font-bold text-5xl">
-                      {/* {badge.name.charAt(0)} */}
+                      {badge.name ? badge.name.charAt(0) : "B"}
                     </span>
                   </div>
                 )}
@@ -322,8 +315,8 @@ export default function BadgeDetailPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {relatedBadges.map((relatedBadge) => (
               <Link
-                href={`/badges/${relatedBadge.id}`}
-                key={relatedBadge.id}
+                href={`/badges/${relatedBadge._id}`}
+                key={relatedBadge._id}
                 className="card overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div className="p-6 flex flex-col items-center">
@@ -337,7 +330,9 @@ export default function BadgeDetailPage() {
                     ) : (
                       <div className="h-full w-full flex items-center justify-center bg-primary-200">
                         <span className="text-primary-700 font-bold text-2xl">
-                          {/* {relatedBadge.name.charAt(0)} */}
+                          {relatedBadge.name
+                            ? relatedBadge.name.charAt(0)
+                            : "B"}
                         </span>
                       </div>
                     )}

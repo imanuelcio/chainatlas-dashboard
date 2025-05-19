@@ -14,6 +14,7 @@ export interface User {
 }
 
 export interface UserProfile extends User {
+  _id: number | undefined;
   stats: UserStats;
   connections: UserConnection[];
 }

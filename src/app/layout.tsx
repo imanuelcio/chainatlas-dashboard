@@ -10,6 +10,7 @@ const robotoMono = Roboto_Mono({
 // Import global styles
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import ReactQueryProvider from "@/components/provider/ReactQueryProvider";
 
 export const metadata = {
   title: "ChainAtlas",
@@ -26,8 +27,10 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${robotoMono.variable} font-sans bg-background text-foreground`}
       >
-        <Toaster position="top-right" />
-        {children}
+        <ReactQueryProvider>
+          <Toaster position="top-right" />
+          {children}
+        </ReactQueryProvider>
       </body>
     </html>
   );

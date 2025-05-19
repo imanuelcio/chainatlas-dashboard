@@ -1,4 +1,5 @@
-import { authAPI } from "./api";
+// auth.ts
+import { fetchFromAPI, queryClient } from "./api";
 import { connectWallet, signMessage } from "./wallet";
 import { User } from "../types/user";
 
@@ -20,9 +21,19 @@ export async function walletAuth(): Promise<AuthState | null> {
       return null;
     }
 
-    // Generate nonce - this should return the userId correctly
-    const nonceResponse = await authAPI.generateNonce(walletAddress);
+    // Generate nonce using direct API call
+    const nonceResponse = await fetchFromAPI<{
+      userId: any;
+      success: boolean;
+      nonce: string;
+      message: string;
+    }>("/auth/wallet/nonce/", {
+      method: "POST",
+      data: { address: walletAddress },
+    });
+
     console.log(nonceResponse);
+
     const message = `Sign this message to authenticate: ${nonceResponse.nonce}`;
     const signature = await signMessage(walletAddress, message);
     const userId = nonceResponse.userId; // Make sure this is a valid MongoDB ObjectId
@@ -31,15 +42,29 @@ export async function walletAuth(): Promise<AuthState | null> {
       return null;
     }
 
-    // Verify signature
-    const authResponse = await authAPI.verifySignature(
-      userId, // This should be the MongoDB ObjectId, not the wallet address
-      walletAddress, // This is the wallet address
-      signature
-    );
+    // Verify signature using direct API call
+    const authResponse = await fetchFromAPI<{
+      success: boolean;
+      token: string;
+      user: any;
+    }>("/auth/wallet/verify", {
+      method: "POST",
+      data: {
+        address: walletAddress,
+        userId,
+        signature,
+      },
+    });
 
-    // Store token and user data
-    localStorage.setItem("auth_token", authResponse.token);
+    // Store token
+    if (authResponse.token) {
+      localStorage.setItem("auth_token", authResponse.token);
+
+      // Invalidate queries to refresh data
+      if (queryClient) {
+        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      }
+    }
 
     return {
       user: authResponse.user,
@@ -61,19 +86,38 @@ export async function walletAuth(): Promise<AuthState | null> {
 }
 
 // Function to handle Discord authentication
-export function discordAuth() {
-  authAPI
-    .getDiscordRedirect()
-    .then((response) => {
-      window.location.href = response.redirectUrl;
-    })
-    .catch((error) => {
-      console.error("Discord auth error", error);
-    });
+export async function discordAuth() {
+  try {
+    // Direct API call for Discord redirect
+    const response = await fetchFromAPI<{
+      success: boolean;
+      redirectUrl: string;
+    }>("/auth/discord");
+
+    window.location.href = response.redirectUrl;
+  } catch (error) {
+    console.error("Discord auth error", error);
+  }
 }
 
 // Function to handle logout
 export function logout() {
+  // Clear local token
   localStorage.removeItem("auth_token");
+
+  // Call logout endpoint (non-blocking)
+  fetchFromAPI<{ success: boolean; message: string }>("/logout", {
+    method: "POST",
+  }).catch((error) => {
+    console.error("Logout error:", error);
+  });
+
+  // Invalidate queries
+  if (queryClient) {
+    queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+    queryClient.clear();
+  }
+
+  // Redirect to login page
   window.location.href = "/login";
 }

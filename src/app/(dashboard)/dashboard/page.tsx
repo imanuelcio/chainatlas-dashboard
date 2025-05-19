@@ -1,61 +1,71 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { usersAPI, eventsAPI, badgesAPI } from "@/lib/api";
+import toast from "react-hot-toast";
 import { UserProfile } from "@/types/user";
 import { Event } from "@/types/event";
-import toast from "react-hot-toast";
 import { Badge } from "@/types/badges";
+import {
+  useUserProfile,
+  usePublishedEvents,
+  useUserBadges,
+  useLeaderboard,
+} from "@/lib/api";
 
 export default function DashboardPage() {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
-  const [recentBadges, setRecentBadges] = useState<
-    { id: string; earned_at: string; badge: Badge }[]
-  >([]);
-  const [leaderboard, setLeaderboard] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Fetch user profile using React Query
+  const {
+    data: profileData,
+    isLoading: isLoadingProfile,
+    isError: isErrorProfile,
+  } = useUserProfile();
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      setIsLoading(true);
-      try {
-        // Fetch user profile
+  // Fetch upcoming events using React Query
+  const {
+    data: eventsData,
+    isLoading: isLoadingEvents,
+    isError: isErrorEvents,
+  } = usePublishedEvents({ limit: 3 });
 
-        // Fetch upcoming events
-        const eventsResponse = await eventsAPI.getAllPublishedEvents({
-          limit: 3,
-        });
-        setUpcomingEvents(eventsResponse.events);
+  // Fetch user badges using React Query
+  const {
+    data: badgesData,
+    isLoading: isLoadingBadges,
+    isError: isErrorBadges,
+  } = useUserBadges();
 
-        // Fetch user badges
-        const badgesResponse = await usersAPI.getUserBadges();
-        // Sort by earned_at and take the 4 most recent badges
-        const sortedBadges = badgesResponse.badges
-          .sort(
-            (a, b) =>
-              new Date(b.earned_at).getTime() - new Date(a.earned_at).getTime()
-          )
-          .slice(0, 4);
-        setRecentBadges(sortedBadges);
-        const profileResponse = await usersAPI.getUserProfile();
-        setProfile(profileResponse.profile);
+  // Fetch leaderboard using React Query
+  const {
+    data: leaderboardData,
+    isLoading: isLoadingLeaderboard,
+    isError: isErrorLeaderboard,
+  } = useLeaderboard(5);
 
-        // Fetch leaderboard
-        const leaderboardResponse = await usersAPI.getLeaderboard(5);
-        setLeaderboard(leaderboardResponse.leaderboard);
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-        toast.error("Failed to load dashboard data");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Extract data from responses
+  const profile: UserProfile | null =
+    profileData?.profile || profileData?.user || null;
+  const upcomingEvents: Event[] = eventsData?.events || [];
 
-    fetchDashboardData();
-  }, []);
+  // Sort badges by earned_at and take the 4 most recent badges
+  const userBadges = badgesData?.badges || [];
+  const recentBadges = [...userBadges]
+    .sort(
+      (a, b) =>
+        new Date(b.earned_at || 0).getTime() -
+        new Date(a.earned_at || 0).getTime()
+    )
+    .slice(0, 4);
+
+  const leaderboard = leaderboardData?.leaderboard || [];
+
+  // Handle errors - notify user if any of the key data failed to load
+  if (isErrorProfile || isErrorEvents || isErrorBadges || isErrorLeaderboard) {
+    toast.error("Failed to load some dashboard data");
+  }
+
+  // Overall loading state - consider done when profile and events are loaded
+  const isLoading = isLoadingProfile || isLoadingEvents;
 
   if (isLoading) {
     return (
@@ -148,8 +158,9 @@ export default function DashboardPage() {
           <div className="mt-4">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Rank:{" "}
-              {profile?.stats?.total_points
-                ? leaderboard.findIndex((user) => user.id === profile.id) + 1
+              {profile?.stats?.total_points && profile?._id
+                ? leaderboard.findIndex((user) => user._id === profile._id) +
+                    1 || "N/A"
                 : "N/A"}
             </p>
           </div>
@@ -243,15 +254,19 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="p-6">
-            {upcomingEvents.length > 0 ? (
+            {isLoadingEvents ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : upcomingEvents.length > 0 ? (
               <div className="space-y-4">
                 {upcomingEvents.map((event) => (
                   <div
-                    key={event.id}
+                    key={event._id}
                     className="flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     <div className="mr-4 h-16 w-16 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden">
-                      {event.image_url ? (
+                      {event?.image_url ? (
                         <img
                           src={event.image_url}
                           alt={event.title}
@@ -297,7 +312,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <Link
-                      href={`/events/${event.id}`}
+                      href={`/events/${event._id}`}
                       className="ml-4 px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-md"
                     >
                       View
@@ -342,30 +357,38 @@ export default function DashboardPage() {
               </p>
             </div>
             <div className="p-6">
-              {recentBadges.length > 0 ? (
+              {isLoadingBadges ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+              ) : recentBadges.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {recentBadges.map((item) => (
-                    <div key={item.id} className="text-center">
+                    <div key={item._id} className="text-center">
                       <div className="mx-auto h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-700 p-1 mb-2 overflow-hidden">
-                        {item.badge.image_url ? (
+                        {item.badge_id && item.badge_id.image_url ? (
                           <img
-                            src={item.badge.image_url}
-                            alt={item.badge.name}
+                            src={item.badge_id.image_url}
+                            alt={item.badge_id.name}
                             className="h-full w-full object-cover rounded-full"
                           />
                         ) : (
                           <div className="h-full w-full flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
                             <span className="text-blue-700 dark:text-blue-300 font-bold">
-                              {/* {item.badge.name.charAt(0)} */}
+                              {item.badge_id?.name
+                                ? item.badge_id.name.charAt(0)
+                                : "B"}
                             </span>
                           </div>
                         )}
                       </div>
                       <p className="text-sm font-medium truncate">
-                        {item.badge.name}
+                        {item.badge_id?.name || "Badge"}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {new Date(item.earned_at).toLocaleDateString()}
+                        {item.earned_at
+                          ? new Date(item.earned_at).toLocaleDateString()
+                          : ""}
                       </p>
                     </div>
                   ))}
@@ -405,80 +428,90 @@ export default function DashboardPage() {
               </p>
             </div>
             <div className="p-6">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200 dark:border-gray-700">
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Rank
-                      </th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        User
-                      </th>
-                      <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Points
-                      </th>
-                      <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Badges
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {leaderboard.map((user, index) => (
-                      <tr
-                        key={index}
-                        className="border-b border-gray-200 dark:border-gray-700 last:border-0"
-                      >
-                        <td className="px-4 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            {index === 0 ? (
-                              <span className="text-yellow-500">🏆</span>
-                            ) : index === 1 ? (
-                              <span className="text-gray-400">🥈</span>
-                            ) : index === 2 ? (
-                              <span className="text-amber-600">🥉</span>
-                            ) : (
-                              <span className="text-gray-500 dark:text-gray-400">
-                                {index + 1}
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden mr-3">
-                              {user.profile_image_url ? (
-                                <img
-                                  src={user.profile_image_url}
-                                  alt={user.username}
-                                  className="h-full w-full object-cover"
-                                />
+              {isLoadingLeaderboard ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Rank
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          User
+                        </th>
+                        <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Points
+                        </th>
+                        <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Badges
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {leaderboard.map((user, index) => (
+                        <tr
+                          key={user._id || index}
+                          className="border-b border-gray-200 dark:border-gray-700 last:border-0"
+                        >
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              {index === 0 ? (
+                                <span className="text-yellow-500">🏆</span>
+                              ) : index === 1 ? (
+                                <span className="text-gray-400">🥈</span>
+                              ) : index === 2 ? (
+                                <span className="text-amber-600">🥉</span>
                               ) : (
-                                <div className="h-full w-full flex items-center justify-center bg-blue-500 text-white">
-                                  {/* {user.username.charAt(0).toUpperCase()} */}
-                                </div>
+                                <span className="text-gray-500 dark:text-gray-400">
+                                  {index + 1}
+                                </span>
                               )}
                             </div>
-                            <div>
-                              <div className="font-medium">{user.username}</div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden mr-3">
+                                {user.profile_image_url ? (
+                                  <img
+                                    src={user.profile_image_url}
+                                    alt={user.username || "User"}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="h-full w-full flex items-center justify-center bg-blue-500 text-white">
+                                    {user.username
+                                      ? user.username.charAt(0).toUpperCase()
+                                      : "U"}
+                                  </div>
+                                )}
+                              </div>
+                              <div>
+                                <div className="font-medium">
+                                  {user.username || "User"}
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-right">
-                          <span className="font-medium">
-                            {user.total_points}
-                          </span>
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-right">
-                          <span className="font-medium">
-                            {user.total_achievements}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-right">
+                            <span className="font-medium">
+                              {user.total_points || 0}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-right">
+                            <span className="font-medium">
+                              {user.total_achievements || 0}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
             <div className="p-6 border-t border-gray-200 dark:border-gray-700">
               <Link

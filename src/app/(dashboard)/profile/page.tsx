@@ -4,16 +4,18 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { usersAPI, authAPI } from "@/lib/api";
+import {
+  useUserProfile,
+  useUpdateUserProfile,
+  useConnectPlatform,
+  useLogout,
+} from "@/lib/api";
 import { UserProfile } from "@/types/user";
 import toast from "react-hot-toast";
-import { logout } from "@/lib/auth";
 import Image from "next/image";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -23,39 +25,30 @@ export default function ProfilePage() {
     "profile" | "connections" | "security"
   >("profile");
   const router = useRouter();
-  // Solusi 1: Ubah response handler di halaman profil
+
+  // Use React Query hooks
+  const { data: profileData, isLoading } = useUserProfile();
+
+  const updateProfileMutation = useUpdateUserProfile();
+  const connectPlatformMutation = useConnectPlatform();
+  const logoutMutation = useLogout();
+
   useEffect(() => {
-    const fetchProfile = async () => {
-      setIsLoading(true);
-      try {
-        const profileResponse = await usersAPI.getUserProfile();
+    if (profileData) {
+      // Extract profile data from the response
+      const userData = profileData.profile || profileData.user;
 
-        // Periksa apakah respons mengandung user atau profile
-        const profileData = profileResponse.profile || profileResponse.user;
-
-        if (profileData) {
-          setProfile(profileData);
-          // Initialize form data with current profile values
-          setFormData({
-            username: profileData.username || "",
-            email: profileData.email || "",
-            profile_image_url: profileData.profile_image_url || "",
-          });
-        } else {
-          throw new Error("Profile data not found in response");
-        }
-
-        console.log("Profile response:", profileResponse);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-        toast.error("Failed to load profile data");
-      } finally {
-        setIsLoading(false);
+      if (userData) {
+        setProfile(userData);
+        // Initialize form data with current profile values
+        setFormData({
+          username: userData.username || "",
+          email: userData.email || "",
+          profile_image_url: userData.profile_image_url || "",
+        });
       }
-    };
-
-    fetchProfile();
-  }, []);
+    }
+  }, [profileData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -68,27 +61,31 @@ export default function ProfilePage() {
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setIsUpdating(true);
     try {
-      const response = await usersAPI.updateUserProfile(formData);
+      const response = await updateProfileMutation.mutateAsync(formData);
       setProfile(response.user);
       toast.success("Profile updated successfully");
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error("Failed to update profile");
-    } finally {
-      setIsUpdating(false);
     }
   };
 
   const handleConnect = async (platform: string) => {
-    toast.error(`${platform} connection not implemented yet.`);
+    try {
+      await connectPlatformMutation.mutateAsync({ platform });
+      toast.success(`Connected to ${platform} successfully`);
+    } catch (error) {
+      console.error(`Error connecting to ${platform}:`, error);
+      toast.error(`${platform} connection not implemented yet.`);
+    }
   };
 
   const handleLogout = async () => {
     try {
-      // await authAPI.logout();
-      logout(); // Clear local storage and redirect
+      await logoutMutation.mutateAsync();
+      // Redirect to login page after successful logout
+      router.push("/login");
     } catch (error) {
       console.error("Error logging out:", error);
       toast.error("Failed to logout");
@@ -147,7 +144,9 @@ export default function ProfilePage() {
                 />
               ) : (
                 <span className="text-blue-700 font-bold text-3xl">
-                  {profile.username ? profile.username.toUpperCase() : "U"}
+                  {profile.username
+                    ? profile.username.charAt(0).toUpperCase()
+                    : "U"}
                 </span>
               )}
             </div>
@@ -335,10 +334,11 @@ export default function ProfilePage() {
                 <div className="pt-4">
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    disabled={isUpdating}
+                    className="px-4 py-2 disabled:bg-gray-400 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    // disabled={updateProfileMutation.isPending}
+                    disabled
                   >
-                    {isUpdating ? (
+                    {updateProfileMutation.isPending ? (
                       <div className="flex items-center">
                         <svg
                           className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
@@ -419,7 +419,10 @@ export default function ProfilePage() {
                         ? "border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200"
                         : "bg-blue-600 hover:bg-blue-700 text-white"
                     } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-                    disabled={!!profile.wallet_address}
+                    disabled={
+                      !!profile.wallet_address ||
+                      connectPlatformMutation.isPending
+                    }
                   >
                     {profile.wallet_address ? "Connected" : "Connect"}
                   </button>
@@ -454,7 +457,9 @@ export default function ProfilePage() {
                         ? "border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200"
                         : "bg-blue-600 hover:bg-blue-700 text-white"
                     } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-                    disabled={!!profile.discord_id}
+                    disabled={
+                      !!profile.discord_id || connectPlatformMutation.isPending
+                    }
                   >
                     {profile.discord_id ? "Connected" : "Connect"}
                   </button>
@@ -468,7 +473,7 @@ export default function ProfilePage() {
                     <div className="h-10 w-10 bg-[#1DA1F2] bg-opacity-20 rounded-full flex items-center justify-center mr-4">
                       <Image
                         src="/icons/twitter.svg"
-                        alt="Discord"
+                        alt="Twitter"
                         width={40}
                         height={40}
                       />
@@ -491,9 +496,11 @@ export default function ProfilePage() {
                         ? "border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200"
                         : "bg-blue-600 hover:bg-blue-700 text-white"
                     } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-                    disabled={profile.connections?.some(
-                      (c) => c.platform === "twitter"
-                    )}
+                    disabled={
+                      profile.connections?.some(
+                        (c) => c.platform === "twitter"
+                      ) || connectPlatformMutation.isPending
+                    }
                   >
                     {profile.connections?.some((c) => c.platform === "twitter")
                       ? "Connected"
@@ -509,7 +516,7 @@ export default function ProfilePage() {
                     <div className="h-10 w-10 bg-[#0088cc] bg-opacity-20 rounded-full flex items-center justify-center mr-4">
                       <Image
                         src="/icons/telegram.svg"
-                        alt="Discord"
+                        alt="Telegram"
                         width={40}
                         height={40}
                       />
@@ -534,9 +541,11 @@ export default function ProfilePage() {
                         ? "border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200"
                         : "bg-blue-600 hover:bg-blue-700 text-white"
                     } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-                    disabled={profile.connections?.some(
-                      (c) => c.platform === "telegram"
-                    )}
+                    disabled={
+                      profile.connections?.some(
+                        (c) => c.platform === "telegram"
+                      ) || connectPlatformMutation.isPending
+                    }
                   >
                     {profile.connections?.some((c) => c.platform === "telegram")
                       ? "Connected"
@@ -624,9 +633,10 @@ export default function ProfilePage() {
                 </p>
                 <button
                   onClick={handleLogout}
+                  disabled={logoutMutation.isPending}
                   className="px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                 >
-                  Sign Out
+                  {logoutMutation.isPending ? "Signing Out..." : "Sign Out"}
                 </button>
               </div>
             </div>

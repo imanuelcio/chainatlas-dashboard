@@ -1,54 +1,47 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { eventsAPI } from "@/lib/api";
+import { useEvent, useRegisterForEvent } from "@/lib/api";
 import { EventWithDetails } from "@/types/event";
 import toast from "react-hot-toast";
 import { Badge } from "@/types/badges";
 
 export default function EventDetailPage() {
   const router = useRouter();
-  const [event, setEvent] = useState<EventWithDetails | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRegistering, setIsRegistering] = useState(false);
   const params = useParams() as { id: string };
-  useEffect(() => {
-    const fetchEvent = async () => {
-      setIsLoading(true);
-      try {
-        const response = await eventsAPI.getEventById(params.id);
-        setEvent(response.event);
-      } catch (error) {
-        console.error("Error fetching event:", error);
-        toast.error("Failed to load event details");
-        router.push("/events");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const eventId = params.id;
 
-    fetchEvent();
-  }, [params.id, router]);
+  // Fetch event details using React Query
+  const { data: eventData, isLoading, isError, refetch } = useEvent(eventId);
 
+  // Registration mutation with React Query
+  const registerMutation = useRegisterForEvent();
+
+  // Extract event from response data
+  const event: EventWithDetails | null = eventData?.event || null;
+
+  // Handle registration
   const handleRegister = async () => {
     if (!event) return;
 
-    setIsRegistering(true);
     try {
-      await eventsAPI.registerForEvent(event.id);
-      toast.success("Successfully registered for the event!");
-
-      // Refresh event data to update registration status
-      const response = await eventsAPI.getEventById(params.id);
-      setEvent(response.event);
+      await registerMutation.mutateAsync(event.id, {
+        onSuccess: () => {
+          toast.success("Successfully registered for the event!");
+          // Refetch event data to update registration status
+          refetch();
+        },
+        onError: (error) => {
+          console.error("Error registering for event:", error);
+          toast.error("Failed to register for the event");
+        },
+      });
     } catch (error) {
       console.error("Error registering for event:", error);
       toast.error("Failed to register for the event");
-    } finally {
-      setIsRegistering(false);
     }
   };
 
@@ -120,6 +113,7 @@ export default function EventDetailPage() {
     return now > eventEnd;
   };
 
+  // Handle loading state
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -130,6 +124,14 @@ export default function EventDetailPage() {
     );
   }
 
+  // Handle error state
+  if (isError) {
+    toast.error("Failed to load event details");
+    router.push("/events");
+    return null;
+  }
+
+  // Handle empty event
   if (!event) {
     return (
       <DashboardLayout>
@@ -476,10 +478,10 @@ export default function EventDetailPage() {
                 {canRegister ? (
                   <button
                     onClick={handleRegister}
-                    disabled={isRegistering}
+                    disabled={registerMutation.isPending}
                     className="btn btn-primary w-full"
                   >
-                    {isRegistering ? (
+                    {registerMutation.isPending ? (
                       <div className="flex items-center justify-center">
                         <svg
                           className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
