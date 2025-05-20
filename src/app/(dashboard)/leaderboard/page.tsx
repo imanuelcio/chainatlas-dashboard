@@ -74,27 +74,27 @@ export default function LeaderboardPage() {
   return (
     <DashboardLayout>
       <div className="max-w-5xl mx-auto">
-        <div className="md:flex md:items-center md:justify-between mb-6">
-          <div className="flex-1 min-w-0">
-            <h2 className="text-2xl font-bold leading-7 text-white sm:text-3xl sm:truncate flex items-center">
-              <TrophyIcon className="h-8 w-8 mr-3 text-yellow-500" />
+        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2 text-white flex items-center">
+              <TrophyIcon className="h-8 w-8 text-indigo-400 mr-3" />
               Community Leaderboard
-            </h2>
-            <p className="mt-1 text-sm text-gray-500">
+            </h1>
+            <p className="text-blue-100/70">
               See who's leading the way in our community
             </p>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow overflow-hidden">
-          <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-indigo-700/20 shadow-lg shadow-indigo-900/10 overflow-hidden">
+          <div className="border-b border-indigo-800/40">
             <div className="flex flex-col sm:flex-row">
               <button
                 onClick={() => handleTabChange("points")}
                 className={`py-4 px-6 text-center font-medium text-sm flex items-center justify-center ${
                   activeTab === "points"
-                    ? "border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                    ? "border-b-2 border-indigo-500 text-indigo-400"
+                    : "text-blue-100/70 hover:text-white"
                 }`}
               >
                 <FireIcon className="h-5 w-5 mr-2" />
@@ -104,8 +104,8 @@ export default function LeaderboardPage() {
                 onClick={() => handleTabChange("badges")}
                 className={`py-4 px-6 text-center font-medium text-sm flex items-center justify-center ${
                   activeTab === "badges"
-                    ? "border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                    ? "border-b-2 border-indigo-500 text-indigo-400"
+                    : "text-blue-100/70 hover:text-white"
                 }`}
               >
                 <TrophyIcon className="h-5 w-5 mr-2" />
@@ -115,8 +115,8 @@ export default function LeaderboardPage() {
                 onClick={() => handleTabChange("events")}
                 className={`py-4 px-6 text-center font-medium text-sm flex items-center justify-center ${
                   activeTab === "events"
-                    ? "border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                    ? "border-b-2 border-indigo-500 text-indigo-400"
+                    : "text-blue-100/70 hover:text-white"
                 }`}
               >
                 <CalendarIcon className="h-5 w-5 mr-2" />
@@ -127,11 +127,11 @@ export default function LeaderboardPage() {
 
           {isLoading ? (
             <div className="flex justify-center my-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-indigo-400 shadow-lg shadow-indigo-500/20"></div>
             </div>
           ) : (
             <div className="overflow-hidden">
-              <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+              <ul className="divide-y divide-indigo-800/40">
                 {leaderboard.length > 0 ? (
                   leaderboard.map((item, index) => {
                     // Get the username and profile image based on the leaderboard type
@@ -140,7 +140,7 @@ export default function LeaderboardPage() {
                     const profileImage =
                       item.user_id?.profile_image_url ||
                       item.profile_image_url ||
-                      "/default-avatar.png";
+                      "/logo/logo.svg";
 
                     // Get the score based on the active tab
                     let score = 0;
@@ -160,10 +160,10 @@ export default function LeaderboardPage() {
                     return (
                       <li
                         key={item._id}
-                        className="px-6 py-5 flex items-center"
+                        className="px-6 py-5 flex items-center hover:bg-slate-700/30 transition-colors duration-200"
                       >
                         <div className="relative flex-shrink-0">
-                          <div className="h-12 w-12 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                          <div className="h-12 w-12 rounded-full overflow-hidden bg-slate-700 border border-indigo-700/30">
                             {profileImage ? (
                               <img
                                 src={profileImage}
@@ -177,25 +177,25 @@ export default function LeaderboardPage() {
                               />
                             ) : (
                               <div className="h-full w-full flex items-center justify-center">
-                                <UserGroupIcon className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+                                <UserGroupIcon className="h-6 w-6 text-indigo-300" />
                               </div>
                             )}
                           </div>
                           {getRankBadge(index)}
                         </div>
                         <div className="ml-4 flex-1">
-                          <div className="font-medium text-gray-900 dark:text-white">
+                          <div className="font-medium text-white">
                             {username}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                          <div className="text-sm text-blue-100/70">
                             Rank #{index + 1}
                           </div>
                         </div>
                         <div className="ml-auto text-right">
-                          <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                          <div className="text-lg font-semibold text-white">
                             {score.toLocaleString()}
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <div className="text-xs text-blue-100/70">
                             {scoreLabel}
                           </div>
                         </div>
@@ -204,7 +204,7 @@ export default function LeaderboardPage() {
                   })
                 ) : (
                   <div className="py-12 text-center">
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <p className="text-blue-100/70">
                       No leaderboard data available
                     </p>
                   </div>
@@ -212,10 +212,10 @@ export default function LeaderboardPage() {
               </ul>
 
               {leaderboard.length > 0 && (
-                <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="px-6 py-4 border-t border-indigo-800/40">
                   <button
                     onClick={handleLoadMore}
-                    className="w-full py-2 px-4 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="w-full py-2 px-4 rounded-lg text-white bg-slate-800/50 hover:bg-indigo-900/30 border border-indigo-800/40 transition-colors duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-800"
                   >
                     Load More
                   </button>
@@ -226,19 +226,19 @@ export default function LeaderboardPage() {
         </div>
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow p-6">
-            <h3 className="font-semibold mb-2 text-gray-900 dark:text-white flex items-center">
-              <FireIcon className="h-5 w-5 mr-2 text-orange-500" />
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-indigo-700/20 shadow-lg shadow-indigo-900/10 p-6">
+            <h3 className="font-semibold mb-2 text-white flex items-center">
+              <FireIcon className="h-5 w-5 mr-2 text-indigo-400" />
               Points System
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            <p className="text-sm text-blue-100/70 mb-4">
               Points are earned through various activities in our community:
             </p>
-            <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-2">
+            <ul className="text-sm text-blue-100/70 space-y-2">
               <li className="flex items-start">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-0.5"
+                  className="h-4 w-4 mr-2 text-indigo-400 flex-shrink-0 mt-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -255,7 +255,7 @@ export default function LeaderboardPage() {
               <li className="flex items-start">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-0.5"
+                  className="h-4 w-4 mr-2 text-indigo-400 flex-shrink-0 mt-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -272,7 +272,7 @@ export default function LeaderboardPage() {
               <li className="flex items-start">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-0.5"
+                  className="h-4 w-4 mr-2 text-indigo-400 flex-shrink-0 mt-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -289,19 +289,19 @@ export default function LeaderboardPage() {
             </ul>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow p-6">
-            <h3 className="font-semibold mb-2 text-gray-900 dark:text-white flex items-center">
-              <TrophyIcon className="h-5 w-5 mr-2 text-yellow-500" />
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-indigo-700/20 shadow-lg shadow-indigo-900/10 p-6">
+            <h3 className="font-semibold mb-2 text-white flex items-center">
+              <TrophyIcon className="h-5 w-5 mr-2 text-indigo-400" />
               Badges Collection
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            <p className="text-sm text-blue-100/70 mb-4">
               Badges are awarded for specific achievements and milestones:
             </p>
-            <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-2">
+            <ul className="text-sm text-blue-100/70 space-y-2">
               <li className="flex items-start">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-0.5"
+                  className="h-4 w-4 mr-2 text-indigo-400 flex-shrink-0 mt-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -318,7 +318,7 @@ export default function LeaderboardPage() {
               <li className="flex items-start">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-0.5"
+                  className="h-4 w-4 mr-2 text-indigo-400 flex-shrink-0 mt-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -335,7 +335,7 @@ export default function LeaderboardPage() {
               <li className="flex items-start">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-0.5"
+                  className="h-4 w-4 mr-2 text-indigo-400 flex-shrink-0 mt-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -352,19 +352,19 @@ export default function LeaderboardPage() {
             </ul>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow p-6">
-            <h3 className="font-semibold mb-2 text-gray-900 dark:text-white flex items-center">
-              <CalendarIcon className="h-5 w-5 mr-2 text-blue-500" />
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-indigo-700/20 shadow-lg shadow-indigo-900/10 p-6">
+            <h3 className="font-semibold mb-2 text-white flex items-center">
+              <CalendarIcon className="h-5 w-5 mr-2 text-indigo-400" />
               Event Participation
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            <p className="text-sm text-blue-100/70 mb-4">
               Active event participants enjoy these benefits:
             </p>
-            <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-2">
+            <ul className="text-sm text-blue-100/70 space-y-2">
               <li className="flex items-start">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-0.5"
+                  className="h-4 w-4 mr-2 text-indigo-400 flex-shrink-0 mt-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -381,7 +381,7 @@ export default function LeaderboardPage() {
               <li className="flex items-start">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-0.5"
+                  className="h-4 w-4 mr-2 text-indigo-400 flex-shrink-0 mt-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -398,7 +398,7 @@ export default function LeaderboardPage() {
               <li className="flex items-start">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-0.5"
+                  className="h-4 w-4 mr-2 text-indigo-400 flex-shrink-0 mt-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

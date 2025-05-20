@@ -1,6 +1,7 @@
 import { Badge } from "./badges";
 
 export interface Event {
+  _id: string;
   id: string;
   title: string;
   description: string;

@@ -106,9 +106,21 @@ export default function CreateBadgePage() {
         <div className="mb-6">
           <Link
             href="/admin/badges"
-            className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+            className="inline-flex items-center text-blue-400 hover:text-cyan-300 transition-colors duration-200"
           >
-            {/* <ArrowLeftIcon className="h-4 w-4 mr-1" /> */}
+            <svg
+              className="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
             Back to Badges
           </Link>
         </div>
@@ -116,25 +128,38 @@ export default function CreateBadgePage() {
         <div className="md:flex md:items-center md:justify-between mb-6">
           <div className="flex-1 min-w-0">
             <h2 className="text-2xl font-bold leading-7 text-white sm:text-3xl sm:truncate flex items-center">
-              {/* <TrophyIcon className="h-8 w-8 mr-3 text-yellow-500" /> */}
+              <svg
+                className="h-8 w-8 mr-3 text-cyan-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                />
+              </svg>
               Create New Badge
             </h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-blue-100/70">
               Add a new badge to recognize and reward community members.
             </p>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow overflow-hidden">
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-blue-700/20 shadow-lg shadow-blue-900/10 overflow-hidden">
           <div className="p-6">
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="col-span-2">
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-white mb-1 flex items-center"
                   >
-                    Badge Name*
+                    Badge Name
+                    <span className="text-cyan-400 ml-1">*</span>
                   </label>
                   <input
                     type="text"
@@ -145,21 +170,22 @@ export default function CreateBadgePage() {
                     placeholder="e.g. Early Contributor"
                     className={`w-full px-3 py-2 border ${
                       errors.name
-                        ? "border-red-500"
-                        : "border-gray-300 dark:border-gray-600"
-                    } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-blue-900/30 focus:ring-blue-500"
+                    } rounded-lg shadow-sm focus:outline-none focus:border-blue-500 bg-slate-700/80 text-white placeholder-slate-400`}
                   />
                   {errors.name && (
-                    <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                    <p className="mt-1 text-sm text-red-400">{errors.name}</p>
                   )}
                 </div>
 
                 <div className="col-span-2">
                   <label
                     htmlFor="description"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-white mb-1 flex items-center"
                   >
-                    Description*
+                    Description
+                    <span className="text-cyan-400 ml-1">*</span>
                   </label>
                   <textarea
                     id="description"
@@ -170,12 +196,12 @@ export default function CreateBadgePage() {
                     placeholder="Describe what this badge represents and how to earn it"
                     className={`w-full px-3 py-2 border ${
                       errors.description
-                        ? "border-red-500"
-                        : "border-gray-300 dark:border-gray-600"
-                    } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-blue-900/30 focus:ring-blue-500"
+                    } rounded-lg shadow-sm focus:outline-none focus:border-blue-500 bg-slate-700/80 text-white placeholder-slate-400`}
                   />
                   {errors.description && (
-                    <p className="mt-1 text-sm text-red-500">
+                    <p className="mt-1 text-sm text-red-400">
                       {errors.description}
                     </p>
                   )}
@@ -184,9 +210,10 @@ export default function CreateBadgePage() {
                 <div>
                   <label
                     htmlFor="image_url"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-white mb-1 flex items-center"
                   >
-                    Image URL*
+                    Image URL
+                    <span className="text-cyan-400 ml-1">*</span>
                   </label>
                   <input
                     type="url"
@@ -197,16 +224,16 @@ export default function CreateBadgePage() {
                     placeholder="https://example.com/badge-image.png"
                     className={`w-full px-3 py-2 border ${
                       errors.image_url
-                        ? "border-red-500"
-                        : "border-gray-300 dark:border-gray-600"
-                    } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-blue-900/30 focus:ring-blue-500"
+                    } rounded-lg shadow-sm focus:outline-none focus:border-blue-500 bg-slate-700/80 text-white placeholder-slate-400`}
                   />
                   {errors.image_url && (
-                    <p className="mt-1 text-sm text-red-500">
+                    <p className="mt-1 text-sm text-red-400">
                       {errors.image_url}
                     </p>
                   )}
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-xs text-blue-100/60">
                     Provide a URL to the badge image (recommended size:
                     200x200px)
                   </p>
@@ -215,20 +242,22 @@ export default function CreateBadgePage() {
                 <div className="flex flex-col space-y-1">
                   {badgeData.image_url && (
                     <div className="mt-2">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-white mb-1">
                         Image Preview
                       </label>
-                      <div className="h-20 w-20 rounded-md bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                        <img
-                          src={badgeData.image_url}
-                          alt="Badge Preview"
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).onerror = null;
-                            (e.target as HTMLImageElement).src =
-                              "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiPjxwYXRoIHN0cm9rZUxpbmVjYXA9InJvdW5kIiBzdHJva2VMaW5lam9pbj0icm91bmQiIHN0cm9rZVdpZHRoPSIxIiBkPSJNMTIgOHY0bDMgM20tNiAwaDEyYTIgMiAwIDAwMi0yVjZhMiAyIDAgMDAtMi0ySDZhMiAyIDAgMDAtMiAydjEyYTIgMiAwIDAwMiAyaDIiLz48L3N2Zz4=";
-                          }}
-                        />
+                      <div className="h-24 w-24 rounded-lg bg-gradient-to-br from-blue-600/50 to-cyan-500/50 p-1 overflow-hidden shadow-lg shadow-blue-900/20">
+                        <div className="h-full w-full rounded-md bg-slate-900/50 overflow-hidden">
+                          <img
+                            src={badgeData.image_url}
+                            alt="Badge Preview"
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).onerror = null;
+                              (e.target as HTMLImageElement).src =
+                                "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiPjxwYXRoIHN0cm9rZUxpbmVjYXA9InJvdW5kIiBzdHJva2VMaW5lam9pbj0icm91bmQiIHN0cm9rZVdpZHRoPSIxIiBkPSJNMTIgOHY0bDMgM20tNiAwaDEyYTIgMiAwIDAwMi0yVjZhMiAyIDAgMDAtMi0ySDZhMiAyIDAgMDAtMiAydjEyYTIgMiAwIDAwMiAyaDIiLz48L3N2Zz4=";
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
                   )}
@@ -237,30 +266,48 @@ export default function CreateBadgePage() {
                 <div>
                   <label
                     htmlFor="category"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-white mb-1 flex items-center"
                   >
-                    Category*
+                    Category
+                    <span className="text-cyan-400 ml-1">*</span>
                   </label>
-                  <select
-                    id="category"
-                    name="category"
-                    value={badgeData.category}
-                    onChange={handleChange}
-                    className={`w-full px-3 py-2 border ${
-                      errors.category
-                        ? "border-red-500"
-                        : "border-gray-300 dark:border-gray-600"
-                    } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
-                  >
-                    <option value="">Select a category</option>
-                    {categoryOptions.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      id="category"
+                      name="category"
+                      value={badgeData.category}
+                      onChange={handleChange}
+                      className={`w-full px-3 py-2 appearance-none border ${
+                        errors.category
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-blue-900/30 focus:ring-blue-500"
+                      } rounded-lg shadow-sm focus:outline-none focus:border-blue-500 bg-slate-700/80 text-white placeholder-slate-400`}
+                    >
+                      <option value="">Select a category</option>
+                      {categoryOptions.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-300">
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
                   {errors.category && (
-                    <p className="mt-1 text-sm text-red-500">
+                    <p className="mt-1 text-sm text-red-400">
                       {errors.category}
                     </p>
                   )}
@@ -269,27 +316,45 @@ export default function CreateBadgePage() {
                 <div>
                   <label
                     htmlFor="points"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    className="block text-sm font-medium text-white mb-1 flex items-center"
                   >
                     Points
+                    <div className="ml-2 bg-blue-900/30 text-blue-300 text-xs px-2 py-0.5 rounded-full">
+                      Optional
+                    </div>
                   </label>
-                  <input
-                    type="number"
-                    id="points"
-                    name="points"
-                    value={badgeData.points}
-                    onChange={handleChange}
-                    min="0"
-                    className={`w-full px-3 py-2 border ${
-                      errors.points
-                        ? "border-red-500"
-                        : "border-gray-300 dark:border-gray-600"
-                    } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
-                  />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg
+                        className="h-5 w-5 text-yellow-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="number"
+                      id="points"
+                      name="points"
+                      value={badgeData.points}
+                      onChange={handleChange}
+                      min="0"
+                      className={`w-full pl-10 pr-3 py-2 border ${
+                        errors.points
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-blue-900/30 focus:ring-blue-500"
+                      } rounded-lg shadow-sm focus:outline-none focus:border-blue-500 bg-slate-700/80 text-white placeholder-slate-400`}
+                    />
+                  </div>
                   {errors.points && (
-                    <p className="mt-1 text-sm text-red-500">{errors.points}</p>
+                    <p className="mt-1 text-sm text-red-400">{errors.points}</p>
                   )}
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-xs text-blue-100/60">
                     The number of XP points awarded when this badge is earned
                   </p>
                 </div>
@@ -298,14 +363,14 @@ export default function CreateBadgePage() {
               <div className="mt-8 flex justify-end">
                 <Link
                   href="/admin/badges"
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md shadow-sm font-medium mr-3 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                  className="px-4 py-2 border border-blue-800/40 text-blue-300 rounded-lg shadow-sm font-medium mr-3 hover:bg-slate-700/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-800 transition-all duration-200"
                 >
                   Cancel
                 </Link>
                 <button
                   type="submit"
                   disabled={createBadgeMutation.isPending}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 disabled:opacity-50"
+                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-800 disabled:opacity-50 shadow-lg shadow-blue-500/20 transition-all duration-200"
                 >
                   {createBadgeMutation.isPending ? (
                     <div className="flex items-center">
@@ -313,7 +378,22 @@ export default function CreateBadgePage() {
                       Creating...
                     </div>
                   ) : (
-                    "Create Badge"
+                    <div className="flex items-center">
+                      <svg
+                        className="w-5 h-5 mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      Create Badge
+                    </div>
                   )}
                 </button>
               </div>
@@ -321,11 +401,11 @@ export default function CreateBadgePage() {
           </div>
         </div>
 
-        <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow p-6">
-          <h3 className="font-semibold mb-2 text-gray-900 dark:text-white flex items-center">
+        <div className="mt-8 bg-slate-800/50 backdrop-blur-sm rounded-xl border border-blue-700/20 shadow-lg shadow-blue-900/10 p-6">
+          <h3 className="font-semibold mb-4 text-white flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2 text-blue-600 dark:text-blue-400"
+              className="h-5 w-5 mr-2 text-cyan-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -339,68 +419,105 @@ export default function CreateBadgePage() {
             </svg>
             Tips for Creating Effective Badges
           </h3>
-          <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-2 mt-3">
-            <li className="flex items-start">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>
-                <strong>Clear Criteria:</strong> Make sure members understand
-                exactly how to earn the badge
-              </span>
-            </li>
-            <li className="flex items-start">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>
-                <strong>Meaningful Rewards:</strong> Assign point values that
-                reflect the effort required
-              </span>
-            </li>
-            <li className="flex items-start">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>
-                <strong>Visual Design:</strong> Use distinct and recognizable
-                images for each badge category
-              </span>
-            </li>
-          </ul>
+          <div className="bg-blue-900/20 rounded-lg p-4 border border-blue-700/30">
+            <ul className="text-sm text-blue-100/80 space-y-3">
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500/20 flex items-center justify-center mr-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-cyan-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <span>
+                  <strong className="text-white">Clear Criteria:</strong> Make
+                  sure members understand exactly how to earn the badge. Be
+                  specific about requirements and expectations.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500/20 flex items-center justify-center mr-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-cyan-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <span>
+                  <strong className="text-white">Meaningful Rewards:</strong>{" "}
+                  Assign point values that reflect the effort required. Higher
+                  difficulty achievements should have correspondingly higher
+                  rewards.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500/20 flex items-center justify-center mr-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-cyan-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <span>
+                  <strong className="text-white">Visual Design:</strong> Use
+                  distinct and recognizable images for each badge category.
+                  Consistent style with clear differentiation helps users
+                  identify achievements at a glance.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500/20 flex items-center justify-center mr-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-cyan-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <span>
+                  <strong className="text-white">Progressive System:</strong>{" "}
+                  Create a badge hierarchy that encourages continued
+                  participation. Consider beginner, intermediate, and expert
+                  levels for key activities.
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </DashboardLayout>

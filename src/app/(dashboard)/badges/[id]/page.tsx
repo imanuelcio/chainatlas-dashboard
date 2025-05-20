@@ -63,7 +63,7 @@ export default function BadgeDetailPage() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full py-16">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-purple-400 shadow-lg shadow-purple-500/20"></div>
         </div>
       </DashboardLayout>
     );
@@ -74,12 +74,45 @@ export default function BadgeDetailPage() {
     return (
       <DashboardLayout>
         <div className="text-center py-16">
-          <h3 className="text-xl font-medium mb-2">Badge not found</h3>
-          <p className="text-muted-foreground mb-6">
+          <div className="bg-slate-700/50 rounded-lg p-6 inline-flex mb-6">
+            <svg
+              className="h-14 w-14 text-purple-400/50"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-xl font-medium mb-2 text-white">
+            Badge not found
+          </h3>
+          <p className="text-blue-100/70 mb-6">
             The badge you're looking for might have been removed or is no longer
             available.
           </p>
-          <Link href="/badges" className="btn btn-primary">
+          <Link
+            href="/badges"
+            className="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-purple-500 to-purple-400 hover:from-purple-600 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-slate-800 shadow-lg shadow-purple-500/20 transition-all duration-200 flex items-center inline-flex"
+          >
+            <svg
+              className="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
             Back to Badges
           </Link>
         </div>
@@ -92,11 +125,11 @@ export default function BadgeDetailPage() {
       {/* Back button */}
       <Link
         href="/badges"
-        className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
+        className="inline-flex items-center text-blue-400 hover:text-cyan-300 transition-colors duration-200 mb-6"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 mr-1"
+          className="h-5 w-5 mr-2"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -105,7 +138,7 @@ export default function BadgeDetailPage() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M15 19l-7-7 7-7"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
           />
         </svg>
         Back to all badges
@@ -114,26 +147,28 @@ export default function BadgeDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Badge Image and Basic Info */}
         <div className="lg:col-span-1">
-          <div className="card flex flex-col items-center p-8">
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-purple-700/20 shadow-lg shadow-purple-900/10 flex flex-col items-center p-8">
             <div className="relative">
-              <div className="h-40 w-40 rounded-full bg-muted overflow-hidden mb-6">
-                {badge.image_url ? (
-                  <img
-                    src={badge.image_url}
-                    alt={badge.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full flex items-center justify-center bg-primary-200">
-                    <span className="text-primary-700 font-bold text-5xl">
-                      {badge.name ? badge.name.charAt(0) : "B"}
-                    </span>
-                  </div>
-                )}
+              <div className="h-40 w-40 rounded-lg bg-gradient-to-br from-purple-600/50 to-blue-500/50 p-1 mb-6 overflow-hidden shadow-lg">
+                <div className="h-full w-full rounded-md bg-slate-900/50 overflow-hidden">
+                  {badge.image_url ? (
+                    <img
+                      src={badge.image_url}
+                      alt={badge.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center bg-purple-500/20 text-white">
+                      <span className="font-bold text-5xl">
+                        {badge.name ? badge.name.charAt(0) : "B"}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {isEarned && (
-                <div className="absolute -top-2 -right-2 bg-primary text-white rounded-full p-2">
+                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-purple-500 to-purple-400 text-white rounded-full p-2 shadow-lg shadow-purple-500/30 z-10">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-6 w-6"
@@ -152,15 +187,17 @@ export default function BadgeDetailPage() {
               )}
             </div>
 
-            <h1 className="text-2xl font-bold text-center mb-2">
+            <h1 className="text-2xl font-bold text-center mb-2 text-white">
               {badge.name}
             </h1>
-            <span className="badge badge-outline mb-4">{badge.category}</span>
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-900/50 text-purple-300 border border-purple-700/30 mb-4">
+              {badge.category}
+            </span>
 
             <div className="flex items-center mb-6">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2 text-secondary"
+                className="h-5 w-5 mr-2 text-yellow-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -172,13 +209,44 @@ export default function BadgeDetailPage() {
                   d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span className="font-medium">{badge.points} points</span>
+              <span className="font-medium text-white">
+                {badge.points} points
+              </span>
             </div>
 
             {isEarned && earnedDate && (
-              <div className="bg-primary bg-opacity-10 text-primary rounded-lg p-4 w-full text-center">
-                <p className="font-medium">Badge Earned!</p>
-                <p className="text-sm mt-1">
+              <div className="bg-purple-500/10 border border-purple-500/20 text-purple-300 rounded-lg p-4 w-full text-center">
+                <div className="flex justify-center mb-2">
+                  <svg
+                    className="h-10 w-10 text-purple-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    />
+                  </svg>
+                </div>
+                <p className="font-medium text-white">Badge Earned!</p>
+                <p className="text-sm mt-1 flex items-center justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
                   Earned on {new Date(earnedDate).toLocaleDateString()}
                 </p>
               </div>
@@ -188,81 +256,115 @@ export default function BadgeDetailPage() {
 
         {/* Badge Details */}
         <div className="lg:col-span-2">
-          <div className="card">
-            <div className="card-header">
-              <h2 className="card-title">Badge Details</h2>
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-blue-700/20 shadow-lg shadow-blue-900/10 overflow-hidden">
+            <div className="p-6 border-b border-blue-800/30 flex items-center">
+              <svg
+                className="h-5 w-5 text-blue-400 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <h2 className="text-xl font-semibold text-white">
+                Badge Details
+              </h2>
             </div>
-            <div className="card-content">
-              <div className="prose prose-invert max-w-none">
+            <div className="p-6">
+              <div className="prose prose-invert max-w-none text-blue-100/80">
                 <p className="whitespace-pre-line">{badge.description}</p>
               </div>
 
               <div className="mt-8">
-                <h3 className="text-xl font-semibold mb-4">
+                <h3 className="text-xl font-semibold mb-4 text-white flex items-center">
+                  <svg
+                    className="h-5 w-5 text-blue-400 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                  </svg>
                   How to Earn This Badge
                 </h3>
-                <div className="bg-muted rounded-lg p-6">
-                  <p className="text-muted-foreground">
+                <div className="bg-blue-900/20 rounded-lg p-6 border border-blue-700/30">
+                  <p className="text-blue-100/70">
                     Badges can be earned through various activities in our
                     community:
                   </p>
-                  <ul className="mt-4 space-y-2">
+                  <ul className="mt-4 space-y-3">
                     <li className="flex items-start">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 mr-2 text-primary flex-shrink-0 mt-0.5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <span>
+                      <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500/20 flex items-center justify-center mr-3">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-blue-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-white">
                         Attending community events and participating in
                         activities
                       </span>
                     </li>
                     <li className="flex items-start">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 mr-2 text-primary flex-shrink-0 mt-0.5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <span>
+                      <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500/20 flex items-center justify-center mr-3">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-blue-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-white">
                         Completing specific challenges related to this badge's
                         category
                       </span>
                     </li>
                     <li className="flex items-start">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 mr-2 text-primary flex-shrink-0 mt-0.5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <span>
+                      <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-500/20 flex items-center justify-center mr-3">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-blue-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-white">
                         Being awarded by admins for special contributions to the
                         community
                       </span>
@@ -272,13 +374,59 @@ export default function BadgeDetailPage() {
               </div>
 
               <div className="mt-8">
-                <h3 className="text-xl font-semibold mb-4">Related Events</h3>
-                <div className="bg-muted rounded-lg p-6">
-                  <p className="text-center text-muted-foreground">
+                <h3 className="text-xl font-semibold mb-4 text-white flex items-center">
+                  <svg
+                    className="h-5 w-5 text-indigo-400 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  Related Events
+                </h3>
+                <div className="bg-indigo-900/20 rounded-lg p-6 border border-indigo-700/30">
+                  <div className="flex items-center justify-center mb-4">
+                    <svg
+                      className="h-12 w-12 text-indigo-400/50"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-center text-blue-100/70 mb-4">
                     Looking for events where you can earn this badge?
                   </p>
-                  <div className="flex justify-center mt-4">
-                    <Link href="/events" className="btn btn-primary">
+                  <div className="flex justify-center">
+                    <Link
+                      href="/events"
+                      className="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-indigo-500 to-indigo-400 hover:from-indigo-600 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-800 shadow-lg shadow-indigo-500/20 transition-all duration-200 flex items-center"
+                    >
+                      <svg
+                        className="h-5 w-5 mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
                       Browse Events
                     </Link>
                   </div>
@@ -291,7 +439,20 @@ export default function BadgeDetailPage() {
 
       {/* More Badges in Same Category */}
       <div className="mt-12">
-        <h2 className="text-2xl font-bold mb-6">
+        <h2 className="text-2xl font-bold mb-6 text-white flex items-center">
+          <svg
+            className="h-6 w-6 text-purple-400 mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            />
+          </svg>
           More Badges in {badge.category}
         </h2>
 
@@ -300,14 +461,14 @@ export default function BadgeDetailPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="card p-6 flex flex-col items-center text-center animate-pulse"
+                className="bg-slate-800/30 rounded-xl border border-purple-700/10 p-6 flex flex-col items-center text-center animate-pulse"
               >
-                <div className="h-24 w-24 rounded-full bg-muted mb-4"></div>
-                <div className="h-5 w-2/3 bg-muted rounded mb-2"></div>
-                <div className="h-4 w-1/3 bg-muted rounded mb-4"></div>
-                <div className="h-4 w-5/6 bg-muted rounded mb-1"></div>
-                <div className="h-4 w-4/6 bg-muted rounded mb-4"></div>
-                <div className="h-4 w-2/6 bg-muted rounded"></div>
+                <div className="h-24 w-24 rounded-lg bg-slate-700/50 mb-4"></div>
+                <div className="h-5 w-2/3 bg-slate-700/50 rounded-full mb-2"></div>
+                <div className="h-4 w-1/3 bg-slate-700/50 rounded-full mb-4"></div>
+                <div className="h-4 w-5/6 bg-slate-700/50 rounded-full mb-1"></div>
+                <div className="h-4 w-4/6 bg-slate-700/50 rounded-full mb-4"></div>
+                <div className="h-4 w-2/6 bg-slate-700/50 rounded-full"></div>
               </div>
             ))}
           </div>
@@ -317,36 +478,41 @@ export default function BadgeDetailPage() {
               <Link
                 href={`/badges/${relatedBadge._id}`}
                 key={relatedBadge._id}
-                className="card overflow-hidden hover:shadow-lg transition-shadow"
+                className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-purple-700/20 shadow-lg shadow-purple-900/10 overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 relative group"
               >
                 <div className="p-6 flex flex-col items-center">
-                  <div className="h-24 w-24 rounded-full bg-muted overflow-hidden mb-4">
-                    {relatedBadge.image_url ? (
-                      <img
-                        src={relatedBadge.image_url}
-                        alt={relatedBadge.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center bg-primary-200">
-                        <span className="text-primary-700 font-bold text-2xl">
-                          {relatedBadge.name
-                            ? relatedBadge.name.charAt(0)
-                            : "B"}
-                        </span>
-                      </div>
-                    )}
+                  <div className="h-24 w-24 rounded-lg bg-gradient-to-br from-purple-600/50 to-blue-500/50 p-1 mb-4 overflow-hidden shadow-lg transform transition-transform duration-300 group-hover:scale-110">
+                    <div className="h-full w-full rounded-md bg-slate-900/50 overflow-hidden">
+                      {relatedBadge.image_url ? (
+                        <img
+                          src={relatedBadge.image_url}
+                          alt={relatedBadge.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center bg-purple-500/20 text-white">
+                          <span className="font-bold text-2xl">
+                            {relatedBadge.name
+                              ? relatedBadge.name.charAt(0)
+                              : "B"}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <h3 className="font-semibold text-lg text-center mb-1">
+                  <h3 className="font-semibold text-lg text-center mb-1 text-white">
                     {relatedBadge.name}
                   </h3>
-                  <p className="text-sm text-muted-foreground text-center mb-3 line-clamp-2">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-900/50 text-purple-300 border border-purple-700/30 mb-2">
+                    {relatedBadge.category}
+                  </span>
+                  <p className="text-sm text-blue-100/70 text-center mb-3 line-clamp-2">
                     {relatedBadge.description}
                   </p>
                   <div className="flex items-center mt-auto">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-1 text-secondary"
+                      className="h-4 w-4 mr-1 text-yellow-400"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -358,7 +524,7 @@ export default function BadgeDetailPage() {
                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium text-white">
                       {relatedBadge.points} points
                     </span>
                   </div>
@@ -367,11 +533,40 @@ export default function BadgeDetailPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 bg-muted rounded-lg">
-            <p className="text-muted-foreground">
+          <div className="text-center py-8 bg-slate-800/50 backdrop-blur-sm rounded-xl border border-purple-700/20 shadow-lg shadow-purple-900/10">
+            <svg
+              className="h-12 w-12 text-purple-400/50 mx-auto mb-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
+            </svg>
+            <p className="text-blue-100/70 mb-4">
               No other badges found in this category.
             </p>
-            <Link href="/badges" className="btn btn-primary mt-4">
+            <Link
+              href="/badges"
+              className="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-purple-500 to-purple-400 hover:from-purple-600 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-slate-800 shadow-lg shadow-purple-500/20 transition-all duration-200 inline-flex items-center"
+            >
+              <svg
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
               View All Badges
             </Link>
           </div>

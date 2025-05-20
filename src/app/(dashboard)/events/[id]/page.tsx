@@ -190,7 +190,7 @@ export default function EventDetailPage() {
       {/* Back button */}
       <Link
         href="/events"
-        className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
+        className="inline-flex items-center text-sm text-blue-100/70 hover:text-white mb-6 transition-colors duration-200"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -212,7 +212,7 @@ export default function EventDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Event details */}
         <div className="lg:col-span-2">
-          <div className="bg-muted rounded-lg overflow-hidden mb-6">
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-indigo-700/20 shadow-lg shadow-indigo-900/10 overflow-hidden mb-6">
             {event.image_url ? (
               <img
                 src={event.image_url}
@@ -220,10 +220,10 @@ export default function EventDetailPage() {
                 className="w-full h-64 object-cover"
               />
             ) : (
-              <div className="w-full h-64 flex items-center justify-center">
+              <div className="w-full h-64 flex items-center justify-center bg-gradient-to-br from-indigo-900/30 to-slate-800/30">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-24 w-24 text-muted-foreground opacity-20"
+                  className="h-24 w-24 text-indigo-500 opacity-20"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -239,30 +239,78 @@ export default function EventDetailPage() {
             )}
           </div>
 
-          <div className="flex items-center space-x-2 mb-4">
-            <span className="badge badge-primary">{event.event_type}</span>
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-900/50 text-indigo-300 border border-indigo-700/30">
+              {event.event_type}
+            </span>
             {event.is_virtual && (
-              <span className="badge badge-outline">Virtual</span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-900/50 text-blue-300 border border-blue-700/30">
+                <svg
+                  className="w-3 h-3 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                Virtual
+              </span>
             )}
             {event.special_reward && (
-              <span className="badge badge-secondary">Special Reward</span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-900/50 text-purple-300 border border-purple-700/30">
+                <svg
+                  className="w-3 h-3 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Special Reward
+              </span>
             )}
           </div>
 
-          <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
+          <h1 className="text-3xl font-bold mb-4 text-white">{event.title}</h1>
 
-          <div className="prose prose-invert max-w-none">
-            <p className="whitespace-pre-line">{event.description}</p>
+          <div className="text-blue-100/70 mb-8 whitespace-pre-line">
+            <p>{event.description}</p>
           </div>
 
           {/* Badge rewards section */}
           {event.badges && event.badges.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-xl font-bold mb-4">Badge Rewards</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {event.badges.map((badge: Badge) => (
-                  <div key={badge.id} className="text-center">
-                    <div className="mx-auto h-20 w-20 rounded-full bg-muted p-1 mb-2 overflow-hidden">
+            <div className="mt-8 bg-slate-800/50 backdrop-blur-sm rounded-xl border border-indigo-700/20 shadow-lg shadow-indigo-900/10 p-6">
+              <h2 className="text-xl font-bold mb-6 text-white flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2 text-indigo-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                  />
+                </svg>
+                Badge Rewards
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                {event.badges.map((badge) => (
+                  <div key={badge.id} className="text-center group">
+                    <div className="mx-auto h-20 w-20 rounded-full bg-gradient-to-br from-indigo-500/30 to-purple-600/30 p-1 mb-3 overflow-hidden shadow-lg shadow-indigo-900/20 group-hover:shadow-indigo-500/30 transition-all duration-300">
                       {badge.image_url ? (
                         <img
                           src={badge.image_url}
@@ -270,15 +318,17 @@ export default function EventDetailPage() {
                           className="h-full w-full object-cover rounded-full"
                         />
                       ) : (
-                        <div className="h-full w-full flex items-center justify-center rounded-full bg-primary-200">
-                          <span className="text-primary-700 font-bold text-xl">
-                            {/* {badge.name.charAt(0)} */}
+                        <div className="h-full w-full flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-indigo-900">
+                          <span className="text-white font-bold text-xl">
+                            {badge.name.charAt(0)}
                           </span>
                         </div>
                       )}
                     </div>
-                    <p className="font-medium">{badge.name}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-medium text-white group-hover:text-indigo-300 transition-colors duration-200">
+                      {badge.name}
+                    </p>
+                    <p className="text-sm text-blue-100/60">
                       {badge.points} points
                     </p>
                   </div>
@@ -290,137 +340,78 @@ export default function EventDetailPage() {
 
         {/* Registration and event info */}
         <div className="lg:col-span-1">
-          <div className="card sticky top-24">
-            <div className="card-header">
-              <h2 className="card-title">Event Information</h2>
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-indigo-700/20 shadow-lg shadow-indigo-900/10 sticky top-24">
+            <div className="p-6 border-b border-indigo-900/30">
+              <h2 className="text-xl font-bold text-white flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2 text-indigo-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Event Information
+              </h2>
             </div>
-            <div className="card-content space-y-4">
-              <p
-                className={`text-center font-medium ${registrationStatusClass}`}
-              >
-                {registrationStatus}
-              </p>
+            <div className="p-6 space-y-4">
+              {/* Registration status */}
+              <div className="text-center py-2">
+                {(() => {
+                  const statusClass = registrationStatus.includes("Registered")
+                    ? "text-green-400"
+                    : registrationStatus.includes("full")
+                    ? "text-red-400"
+                    : registrationStatus.includes("closed")
+                    ? "text-red-400"
+                    : registrationStatus.includes("progress")
+                    ? "text-orange-400"
+                    : registrationStatus.includes("ended")
+                    ? "text-red-400"
+                    : "text-indigo-400";
 
-              <div>
-                <p className="text-sm text-muted-foreground">Date</p>
-                <div className="flex items-center mt-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2 text-muted-foreground"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <p className="font-medium">{dateTime.date}</p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-sm text-muted-foreground">Time</p>
-                <div className="flex items-center mt-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2 text-muted-foreground"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <p className="font-medium">{dateTime.time}</p>
-                </div>
-              </div>
-
-              {event.location && (
-                <div>
-                  <p className="text-sm text-muted-foreground">Location</p>
-                  <div className="flex items-center mt-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-2 text-muted-foreground"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                    <p className="font-medium">{event.location}</p>
-                  </div>
-                </div>
-              )}
-
-              {event.max_participants && (
-                <div>
-                  <p className="text-sm text-muted-foreground">Participants</p>
-                  <div className="flex items-center mt-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-2 text-muted-foreground"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
-                    <p className="font-medium">
-                      {event.participant_count} / {event.max_participants}{" "}
-                      registered
+                  return (
+                    <p className={`font-medium ${statusClass}`}>
+                      {registrationStatus}
                     </p>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2 mt-2">
-                    <div
-                      className={`rounded-full h-2 ${
-                        isFull ? "bg-red-500" : "bg-primary"
-                      }`}
-                      style={{
-                        width: `${Math.min(
-                          (event.participant_count / event.max_participants) *
-                            100,
-                          100
-                        )}%`,
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              )}
+                  );
+                })()}
+              </div>
 
-              {event.registration_deadline && (
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    Registration Deadline
-                  </p>
-                  <div className="flex items-center mt-1">
+              <div className="space-y-4 divide-y divide-indigo-900/30">
+                <div className="pt-4">
+                  <p className="text-sm text-blue-100/60 mb-1">Date</p>
+                  <div className="flex items-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-2 text-muted-foreground"
+                      className="h-5 w-5 mr-2 text-indigo-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <p className="font-medium text-white">{dateTime.date}</p>
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <p className="text-sm text-blue-100/60 mb-1">Time</p>
+                  <div className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-2 text-indigo-400"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -432,27 +423,124 @@ export default function EventDetailPage() {
                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <p className="font-medium">
-                      {new Date(
-                        event.registration_deadline
-                      ).toLocaleDateString()}{" "}
-                      at{" "}
-                      {new Date(event.registration_deadline).toLocaleTimeString(
-                        [],
-                        {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }
-                      )}
-                    </p>
+                    <p className="font-medium text-white">{dateTime.time}</p>
                   </div>
                 </div>
-              )}
+
+                {event.location && (
+                  <div className="pt-4">
+                    <p className="text-sm text-blue-100/60 mb-1">Location</p>
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-2 text-indigo-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                      <p className="font-medium text-white">{event.location}</p>
+                    </div>
+                  </div>
+                )}
+
+                {event.max_participants && (
+                  <div className="pt-4">
+                    <p className="text-sm text-blue-100/60 mb-1">
+                      Participants
+                    </p>
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-2 text-indigo-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                        />
+                      </svg>
+                      <p className="font-medium text-white">
+                        {event.participant_count} / {event.max_participants}{" "}
+                        registered
+                      </p>
+                    </div>
+                    <div className="w-full bg-slate-700/50 rounded-full h-2 mt-2 overflow-hidden">
+                      <div
+                        className={`rounded-full h-2 ${
+                          isFull
+                            ? "bg-gradient-to-r from-red-500 to-red-400"
+                            : "bg-gradient-to-r from-indigo-500 to-indigo-400"
+                        }`}
+                        style={{
+                          width: `${Math.min(
+                            (event.participant_count / event.max_participants) *
+                              100,
+                            100
+                          )}%`,
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+
+                {event.registration_deadline && (
+                  <div className="pt-4">
+                    <p className="text-sm text-blue-100/60 mb-1">
+                      Registration Deadline
+                    </p>
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-2 text-indigo-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <p className="font-medium text-white">
+                        {new Date(
+                          event.registration_deadline
+                        ).toLocaleDateString()}{" "}
+                        at{" "}
+                        {new Date(
+                          event.registration_deadline
+                        ).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {event.special_reward && (
-                <div className="border-t border-border pt-4 mt-4">
-                  <div className="bg-secondary bg-opacity-10 text-secondary rounded-lg p-4">
-                    <h3 className="font-semibold flex items-center">
+                <div className="pt-4 mt-4">
+                  <div className="rounded-lg bg-gradient-to-br from-purple-900/30 to-indigo-900/30 border border-purple-700/30 p-4">
+                    <h3 className="font-semibold flex items-center text-purple-300">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-5 w-5 mr-2"
@@ -469,17 +557,19 @@ export default function EventDetailPage() {
                       </svg>
                       Special Reward
                     </h3>
-                    <p className="text-sm mt-2">{event.special_reward}</p>
+                    <p className="text-sm mt-2 text-blue-100/70">
+                      {event.special_reward}
+                    </p>
                   </div>
                 </div>
               )}
 
-              <div className="border-t border-border pt-4 mt-4">
+              <div className="pt-6 mt-4">
                 {canRegister ? (
                   <button
                     onClick={handleRegister}
                     disabled={registerMutation.isPending}
-                    className="btn btn-primary w-full"
+                    className="w-full py-2.5 px-4 rounded-lg text-white bg-gradient-to-r from-indigo-500 to-indigo-400 hover:from-indigo-600 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-800 shadow-lg shadow-indigo-500/20 transition-all duration-200"
                   >
                     {registerMutation.isPending ? (
                       <div className="flex items-center justify-center">
@@ -511,12 +601,30 @@ export default function EventDetailPage() {
                   </button>
                 ) : event.is_registered ? (
                   <div className="text-center">
-                    <div className="bg-primary bg-opacity-10 text-primary rounded-lg p-4 mb-4">
-                      <p className="font-medium">
+                    <div className="bg-gradient-to-br from-green-900/30 to-green-700/30 rounded-lg border border-green-700/30 p-4 mb-4">
+                      <div className="flex items-center justify-center mb-2">
+                        <div className="h-8 w-8 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 text-green-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                      <p className="font-medium text-green-400">
                         You are registered for this event!
                       </p>
                       {event.is_virtual && (
-                        <p className="text-sm mt-2">
+                        <p className="text-sm mt-2 text-blue-100/70">
                           Check your email for event details and access
                           information.
                         </p>
@@ -548,15 +656,29 @@ export default function EventDetailPage() {
                           "event.ics"
                         )
                       }
-                      className="btn btn-outline"
+                      className="py-2.5 px-4 rounded-lg border border-indigo-700/30 bg-slate-800/50 text-indigo-300 hover:bg-indigo-900/30 transition-all duration-200 shadow-md inline-flex items-center"
                     >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
                       Add to Calendar
                     </button>
                   </div>
                 ) : (
                   <button
                     disabled={true}
-                    className="btn btn-primary w-full opacity-50 cursor-not-allowed"
+                    className="w-full py-2.5 px-4 rounded-lg border border-indigo-700/20 bg-slate-800/30 text-indigo-300/50 cursor-not-allowed"
                   >
                     {isEnded
                       ? "Event has ended"

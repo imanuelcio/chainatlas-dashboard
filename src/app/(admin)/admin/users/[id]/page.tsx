@@ -690,9 +690,9 @@ export default function UserDetailsPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {userEvents.slice(0, 5).map((userEvent) => (
+                  {userEvents.slice(0, 5).map((userEvent, i) => (
                     <tr
-                      key={userEvent._id}
+                      key={i}
                       className="hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
