@@ -148,9 +148,9 @@ export default function BadgesPage() {
             } transition-colors duration-200 flex items-center`}
           >
             Earned
-            <span className="ml-2 bg-purple-900/40 text-purple-300 text-xs px-2 py-0.5 rounded-full">
+            {/* <span className="ml-2 bg-purple-900/40 text-purple-300 text-xs px-2 py-0.5 rounded-full">
               {userBadges.length}
-            </span>
+            </span> */}
           </button>
         </nav>
       </div>
