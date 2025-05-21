@@ -44,8 +44,8 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
-  const authStatus = localStorage.getItem("auth_token");
   useEffect(() => {
+    const authStatus = localStorage.getItem("auth_token");
     if (authStatus) {
       router.push("/dashboard");
     }
