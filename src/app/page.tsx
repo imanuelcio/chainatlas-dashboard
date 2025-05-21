@@ -329,7 +329,7 @@ export default function Home() {
           {/* Tagline with typing effect */}
           <div className="relative mb-10 sm:mb-12">
             <p className="text-xl sm:text-2xl text-indigo-100/80 font-light">
-              Your gateway to blockchain exploration
+              Manage your information on ChainAtlas
             </p>
             <div className="h-px w-24 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto mt-4"></div>
           </div>
