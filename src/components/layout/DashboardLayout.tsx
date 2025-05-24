@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { User } from "@/types/user";
+import toast from "react-hot-toast";
+import { useLogout } from "@/lib/api";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -12,37 +14,20 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  console.log(user);
-  // useEffect(() => {
-  //   const fetchProfile = async () => {
-  //     setIsLoading(true);
-  //     try {
-  //       const profileResponse = await usersAPI.getUserProfile();
-
-  //       // Periksa apakah respons mengandung user atau profile
-  //       const profileData = profileResponse.profile || profileResponse.user;
-
-  //       if (profileData) {
-  //         setUser(profileData);
-  //         // Initialize form data with current profile values
-  //       } else {
-  //         throw new Error("Profile data not found in response");
-  //       }
-
-  //       console.log("Profile response:", profileResponse);
-  //     } catch (error) {
-  //       console.error("Error fetching profile:", error);
-  //       toast.error("Failed to load profile data");
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchProfile();
-  // }, []);
-
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const logoutMutation = useLogout();
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+      // Redirect to login page after successful logout
+      router.push("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast.error("Failed to logout");
+    }
+  };
   const isActive = (path: string) => {
     return (
       pathname === path || (path !== "/dashboard" && pathname.startsWith(path))
@@ -50,23 +35,33 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-900 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800 via-blue-900/20 to-slate-900">
+    <div className="flex min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-blue-950/30 to-slate-950">
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform bg-slate-900 bg-opacity-80 backdrop-blur-lg border-r border-blue-800/40 transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform bg-slate-900/95 backdrop-blur-xl border-r border-slate-700/50 transition-transform duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 overflow-y-auto`}
       >
-        <div className="flex h-16 items-center border-b border-blue-800/40 px-6">
-          <Link
-            href="/dashboard"
-            className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300"
-          >
-            ChainAtlas Dashboard
+        {/* Logo section */}
+        <div className="flex h-16 items-center border-b border-slate-700/50 px-6">
+          <Link href="/dashboard" className="group flex items-center space-x-3">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
+              <svg
+                className="h-5 w-5 text-white"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 group-hover:from-blue-300 group-hover:to-cyan-200 transition-all duration-200">
+              ChainAtlas
+            </span>
           </Link>
         </div>
 
-        <nav className="mt-6 px-4 space-y-1">
+        {/* Navigation */}
+        <nav className="mt-8 px-4 space-y-2">
           {[
             {
               name: "Dashboard",
@@ -83,11 +78,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               href: "/badges",
               icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
             },
-            // {
-            //   name: "Hex Map",
-            //   href: "/hexmap",
-            //   icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z",
-            // },
             {
               name: "Leaderboard",
               href: "/leaderboard",
@@ -102,17 +92,22 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <Link
               key={item.name}
               href={item.href}
-              className={`group flex items-center px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out rounded-lg ${
+              className={`group flex items-center px-4 py-3 text-sm font-medium transition-all duration-200 ease-in-out rounded-xl relative ${
                 isActive(item.href)
-                  ? "bg-blue-800/30 text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]"
-                  : "text-gray-300 hover:bg-blue-700/20 hover:text-white"
+                  ? "bg-gradient-to-r from-blue-600/20 to-cyan-600/20 text-white border border-blue-500/30"
+                  : "text-slate-300 hover:bg-slate-800/50 hover:text-white"
               }`}
             >
+              {/* Active indicator */}
+              {isActive(item.href) && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-400 to-cyan-400 rounded-r-full"></div>
+              )}
+
               <svg
                 className={`mr-3 h-5 w-5 transition-colors duration-200 ease-in-out ${
                   isActive(item.href)
                     ? "text-cyan-400"
-                    : "text-gray-400 group-hover:text-cyan-400"
+                    : "text-slate-400 group-hover:text-cyan-400"
                 }`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -132,19 +127,26 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           ))}
         </nav>
 
-        {/* Version info at bottom of sidebar */}
-        <div className="mt-6 px-6 py-4 border-t border-blue-800/40">
-          <div className="flex items-center">
-            <div className="h-2 w-2 rounded-full bg-cyan-400 mr-2 animate-pulse"></div>
-            <p className="text-xs text-gray-400">v1.0.0</p>
+        {/* Version info */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-slate-700/50 bg-slate-900/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="h-2 w-2 rounded-full bg-emerald-400 mr-2">
+                <div className="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></div>
+              </div>
+              <p className="text-xs text-slate-400 font-medium">
+                System Online
+              </p>
+            </div>
+            <p className="text-xs text-slate-500">v1.0.0</p>
           </div>
         </div>
       </div>
 
-      {/* Mobile sidebar backdrop */}
+      {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-slate-900 bg-opacity-70 backdrop-blur-sm z-40 md:hidden"
+          className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setSidebarOpen(false)}
         ></div>
       )}
@@ -152,11 +154,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main content */}
       <div className="flex-1 flex flex-col md:ml-64">
         {/* Header */}
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-4 bg-slate-900 bg-opacity-80 backdrop-blur-md border-b border-blue-800/40 px-6">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-4 bg-slate-900/95 backdrop-blur-xl border-b border-slate-700/50 px-6">
           {/* Mobile menu button */}
           <button
             type="button"
-            className="inline-flex md:hidden items-center justify-center rounded-md text-gray-300 hover:text-white"
+            className="inline-flex md:hidden items-center justify-center rounded-lg p-2 text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all duration-200"
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             <span className="sr-only">Open sidebar</span>
@@ -177,12 +179,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </svg>
           </button>
 
-          {/* Page title based on current path */}
+          {/* Page title */}
           <div className="flex-1">
-            <h1 className="text-lg font-medium text-white">
+            <h1 className="text-xl font-semibold text-white">
               {pathname === "/dashboard" && "Dashboard"}
               {pathname === "/events" && "Events"}
-              {pathname === "/badges" && "Badges"}
+              {pathname === "/badges" && "Honor System"}
               {pathname === "/hexmap" && "Hex Map"}
               {pathname === "/leaderboard" && "Leaderboard"}
               {pathname === "/profile" && "Profile"}
@@ -195,22 +197,24 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </h1>
           </div>
 
-          {/* User dropdown */}
+          {/* User section */}
           <div className="flex items-center">
-            <div className="relative ml-3">
+            <div className="relative">
               <button
                 type="button"
-                className="flex max-w-xs items-center rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                className="cursor-pointer flex items-center space-x-3 rounded-xl px-3 py-2 hover:bg-slate-800/50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
               >
-                <span className="sr-only">Open user menu</span>
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white">
-                  {user?.username ? user.username[0].toUpperCase() : ""}
+                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-semibold shadow-lg">
+                  {user?.username ? user.username[0].toUpperCase() : "U"}
                 </div>
-                {/* <span className="ml-2 text-sm font-medium text-gray-300">
-                  {user?.username || "Loading..."}
-                </span> */}
+                <div className="hidden sm:block text-left">
+                  <p className="text-xs text-slate-400">Online</p>
+                </div>
                 <svg
-                  className="ml-1 h-4 w-4 text-gray-400"
+                  className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${
+                    userDropdownOpen ? "rotate-180" : ""
+                  }`}
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -224,100 +228,47 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   />
                 </svg>
               </button>
-            </div>
-          </div>
-        </header>
 
-        {/* Main content */}
-        <main className="flex-1 p-6 overflow-auto">
-          {/* Content cards with blue theme */}
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            <div className="bg-gradient-to-br from-slate-800 to-blue-900/30 rounded-xl p-5 border border-blue-700/20 shadow-lg shadow-blue-900/10">
-              <h3 className="text-lg font-medium text-white mb-3">
-                Quick Stats
-              </h3>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="bg-blue-500/20 p-3 rounded-lg">
+              {/* Dropdown Menu */}
+              {userDropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-xl shadow-xl shadow-black/20 py-2 z-50">
+                  {/* Menu Items */}
+                  <div className="border-t border-slate-700/50 my-1"></div>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200"
+                  >
                     <svg
-                      className="h-6 w-6 text-blue-400"
+                      className="mr-3 h-4 w-4"
                       fill="none"
-                      viewBox="0 0 24 24"
                       stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                       />
                     </svg>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-400">Total Achievements</p>
-                    <h4 className="text-xl font-semibold text-white">247</h4>
-                  </div>
+                    Sign Out
+                  </button>
                 </div>
-              </div>
+              )}
             </div>
+          </div>
+        </header>
 
-            <div className="bg-gradient-to-br from-slate-800 to-blue-900/30 rounded-xl p-5 border border-blue-700/20 shadow-lg shadow-blue-900/10">
-              <h3 className="text-lg font-medium text-white mb-3">
-                Upcoming Events
-              </h3>
-              <div className="text-sm text-gray-300">
-                <p className="mb-2">Blockchain Hackathon - May 25</p>
-                <p>Web3 Conference - June 3</p>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-slate-800 to-blue-900/30 rounded-xl p-5 border border-blue-700/20 shadow-lg shadow-blue-900/10">
-              <h3 className="text-lg font-medium text-white mb-3">
-                Latest Badges
-              </h3>
-              <div className="flex space-x-2">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-cyan-300 flex items-center justify-center">
-                  <svg
-                    className="h-5 w-5 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-400 flex items-center justify-center">
-                  <svg
-                    className="h-5 w-5 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div> */}
-
-          {children}
+        {/* Main content area */}
+        <main className="flex-1 p-6 overflow-auto">
+          <div className="max-w-7xl mx-auto">{children}</div>
         </main>
 
         {/* Footer */}
-        <footer className="bg-slate-900 bg-opacity-80 backdrop-blur-md border-t border-blue-800/40 p-4 text-center text-sm text-gray-500">
-          <p>
-            &copy; {new Date().getFullYear()} ChainAtlas Dashboard. All rights
-            reserved.
+        <footer className="bg-slate-900/50 backdrop-blur-sm border-t border-slate-700/50 p-4 text-center">
+          <p className="text-sm text-slate-400">
+            &copy; {new Date().getFullYear()} ChainAtlas Dashboard. Built with
+            ❤️
           </p>
         </footer>
       </div>

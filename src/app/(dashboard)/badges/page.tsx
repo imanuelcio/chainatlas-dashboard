@@ -172,96 +172,142 @@ export default function BadgesPage() {
                 <Link
                   href={`/badges/${badge._id}`}
                   key={badge._id}
-                  className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-purple-700/20 shadow-lg shadow-purple-900/10 overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 relative group"
+                  className="group relative block"
                 >
-                  {isEarned && (
-                    <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-purple-400 text-white rounded-full p-1 z-10 shadow-lg shadow-purple-500/30">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                  <div className="p-6 flex flex-col items-center">
-                    <div className="h-28 w-28 rounded-lg bg-gradient-to-br from-purple-600/50 to-blue-500/50 p-1 mb-4 overflow-hidden shadow-lg transform transition-transform duration-300 group-hover:scale-110">
-                      <div className="h-full w-full rounded-md bg-slate-900/50 overflow-hidden">
-                        {badge.image_url ? (
-                          <img
-                            src={badge.image_url}
-                            alt={badge.name}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center bg-purple-500/20 text-white">
-                            <span className="font-bold text-3xl">
-                              {badge.name ? badge.name.charAt(0) : "B"}
-                            </span>
+                  {/* Animated background glow */}
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
+
+                  {/* Main card */}
+                  <div className="relative bg-gradient-to-br from-slate-900/90 via-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden transition-all duration-500 group-hover:scale-[1.02] group-hover:rotate-1">
+                    {/* Shine effect overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+
+                    {/* Earned indicator with pulse animation */}
+                    {isEarned && (
+                      <div className="absolute top-4 right-4 z-20">
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-40"></div>
+                          <div className="relative bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-900 rounded-full p-2 shadow-lg shadow-emerald-500/40">
+                            <svg
+                              className="h-5 w-5"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
                           </div>
-                        )}
-                      </div>
-                    </div>
-                    <h3 className="font-semibold text-lg text-center mb-1 text-white">
-                      {badge.name}
-                    </h3>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-900/50 text-purple-300 border border-purple-700/30 mb-2">
-                      {badge.category}
-                    </span>
-                    <p className="text-sm text-blue-100/70 text-center mb-3 line-clamp-3">
-                      {badge.description}
-                    </p>
-                    <div className="flex items-center mt-auto">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 mr-1 text-yellow-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <span className="text-sm font-medium text-white">
-                        {badge.points} points
-                      </span>
-                    </div>
-                    {isEarned && userBadge && (
-                      <div className="flex items-center mt-2 text-purple-300">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 mr-1"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                        <span className="text-xs">
-                          Earned on{" "}
-                          {userBadge.earned_at
-                            ? new Date(userBadge.earned_at).toLocaleDateString()
-                            : "Unknown date"}
-                        </span>
+                        </div>
                       </div>
                     )}
+
+                    <div className="relative p-8">
+                      {/* Badge image container with enhanced styling */}
+                      <div className="relative mx-auto mb-6 w-32 h-32">
+                        {/* Rotating border gradient */}
+                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 p-0.5 animate-spin-slow">
+                          <div className="h-full w-full rounded-2xl bg-slate-900"></div>
+                        </div>
+
+                        {/* Inner image container */}
+                        <div className="absolute inset-2 rounded-xl bg-gradient-to-br from-purple-600/20 via-pink-600/20 to-blue-600/20 backdrop-blur-sm overflow-hidden group-hover:scale-110 transition-transform duration-500">
+                          {badge.image_url ? (
+                            <img
+                              src={badge.image_url}
+                              alt={badge.name}
+                              className="h-full w-full object-cover transition-all duration-500 group-hover:brightness-110 group-hover:contrast-110"
+                            />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-purple-500/30 to-blue-500/30 text-white">
+                              <span className="font-black text-4xl bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent">
+                                {badge.name ? badge.name.charAt(0) : "B"}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Badge name with gradient text */}
+                      <h3 className="text-xl font-black text-center mb-3 bg-gradient-to-r from-white via-purple-100 to-white bg-clip-text text-transparent leading-tight">
+                        {badge.name}
+                      </h3>
+
+                      {/* Category tag with glassmorphism */}
+                      <div className="flex justify-center mb-4">
+                        <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-white/10 backdrop-blur-md text-purple-200 border border-white/20 shadow-lg shadow-purple-500/10">
+                          <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mr-2 animate-pulse"></div>
+                          {badge.category}
+                        </span>
+                      </div>
+
+                      {/* Description with better typography */}
+                      <p className="text-sm text-slate-300 text-center mb-6 leading-relaxed line-clamp-3 font-medium">
+                        {badge.description}
+                      </p>
+
+                      {/* Points display with enhanced styling */}
+                      <div className="flex items-center justify-center mb-4">
+                        <div className="flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-yellow-500/20 to-amber-500/20 backdrop-blur-sm border border-yellow-500/30">
+                          <div className="relative mr-2">
+                            <div className="absolute inset-0 bg-yellow-400 rounded-full animate-ping opacity-30"></div>
+                            <svg
+                              className="relative h-5 w-5 text-yellow-300"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                              <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                          <span className="text-base font-bold bg-gradient-to-r from-yellow-200 to-amber-200 bg-clip-text text-transparent">
+                            {badge.points} points
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Earned date with improved styling */}
+                      {isEarned && userBadge && (
+                        <div className="flex items-center justify-center">
+                          <div className="flex items-center px-3 py-1.5 rounded-full bg-emerald-500/10 backdrop-blur-sm border border-emerald-500/20 text-emerald-300">
+                            <svg
+                              className="h-4 w-4 mr-2"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                            <span className="text-xs font-medium">
+                              Earned{" "}
+                              {userBadge.earned_at
+                                ? new Date(
+                                    userBadge.earned_at
+                                  ).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })
+                                : "Unknown"}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bottom gradient accent */}
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 opacity-60 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                 </Link>
               );
@@ -309,97 +355,183 @@ export default function BadgesPage() {
             <Link
               href={`/badges/${userBadge.badge_id?._id || ""}`}
               key={userBadge._id}
-              className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-purple-700/20 shadow-lg shadow-purple-900/10 overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 relative group"
+              className="group relative block"
             >
-              {userBadge.badge_id && (
-                <div className="p-6 flex flex-col items-center">
-                  <div className="h-28 w-28 rounded-lg bg-gradient-to-br from-purple-600/50 to-blue-500/50 p-1 mb-4 overflow-hidden shadow-lg transform transition-transform duration-300 group-hover:scale-110">
-                    <div className="h-full w-full rounded-md bg-slate-900/50 overflow-hidden">
-                      {userBadge.badge_id.image_url ? (
-                        <img
-                          src={userBadge.badge_id.image_url}
-                          alt={userBadge.badge_id.name}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center bg-purple-500/20 text-white">
-                          <span className="font-bold text-3xl">
-                            {userBadge.badge_id.name
-                              ? userBadge.badge_id.name.charAt(0)
-                              : "B"}
-                          </span>
+              {/* Animated background glow with enhanced earned badge effect */}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 via-purple-600 to-gold-500 rounded-2xl blur opacity-40 group-hover:opacity-70 transition duration-1000 group-hover:duration-200 animate-tilt-earned"></div>
+
+              {/* Main card */}
+              <div className="relative bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-xl rounded-2xl border border-emerald-400/20 overflow-hidden transition-all duration-500 group-hover:scale-[1.02] group-hover:-rotate-1 shadow-xl shadow-emerald-500/10">
+                {/* Premium shine effect overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+
+                {/* Floating particles effect */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                  <div className="absolute top-4 left-4 w-1 h-1 bg-emerald-400 rounded-full animate-float-1 opacity-60"></div>
+                  <div className="absolute top-8 right-6 w-1.5 h-1.5 bg-gold-400 rounded-full animate-float-2 opacity-70"></div>
+                  <div className="absolute bottom-6 left-6 w-1 h-1 bg-purple-400 rounded-full animate-float-3 opacity-50"></div>
+                </div>
+
+                {userBadge.badge_id && (
+                  <div className="relative p-8">
+                    {/* Enhanced earned indicator with crown effect */}
+                    <div className="absolute top-4 right-4 z-20">
+                      <div className="relative">
+                        {/* Multiple pulsing rings */}
+                        <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-30"></div>
+                        <div className="absolute inset-1 bg-gold-400 rounded-full animate-ping opacity-20 animation-delay-300"></div>
+
+                        {/* Main earned badge */}
+                        <div className="relative bg-gradient-to-r from-emerald-400 via-gold-400 to-emerald-400 text-slate-900 rounded-full p-2.5 shadow-lg shadow-emerald-500/50 border-2 border-white/20">
+                          <svg
+                            className="h-6 w-6"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
                         </div>
-                      )}
+
+                        {/* Crown decoration */}
+                        <div className="absolute -top-2 -right-1 text-gold-400 animate-bounce">
+                          <svg
+                            className="h-4 w-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Enhanced badge image container */}
+                    <div className="relative mx-auto mb-6 w-36 h-36">
+                      {/* Multi-layered rotating borders */}
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-400 via-gold-400 to-purple-500 p-0.5 animate-spin-slow">
+                        <div className="h-full w-full rounded-2xl bg-slate-900"></div>
+                      </div>
+                      <div className="absolute inset-1 rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-emerald-400 p-0.5 animate-spin-reverse">
+                        <div className="h-full w-full rounded-2xl bg-slate-900"></div>
+                      </div>
+
+                      {/* Inner image container with enhanced glow */}
+                      <div className="absolute inset-3 rounded-xl bg-gradient-to-br from-emerald-600/30 via-gold-600/20 to-purple-600/30 backdrop-blur-sm overflow-hidden group-hover:scale-110 transition-transform duration-500 shadow-inner shadow-emerald-500/20">
+                        {userBadge.badge_id.image_url ? (
+                          <img
+                            src={userBadge.badge_id.image_url}
+                            alt={userBadge.badge_id.name}
+                            className="h-full w-full object-cover transition-all duration-500 group-hover:brightness-125 group-hover:contrast-110 group-hover:saturate-110"
+                          />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-emerald-500/40 to-gold-500/40 text-white">
+                            <span className="font-black text-5xl bg-gradient-to-r from-emerald-200 via-gold-200 to-white bg-clip-text text-transparent drop-shadow-lg">
+                              {userBadge.badge_id.name
+                                ? userBadge.badge_id.name.charAt(0)
+                                : "B"}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Sparkle effects */}
+                      <div className="absolute top-2 left-2 w-2 h-2 bg-gold-300 rounded-full animate-sparkle opacity-70"></div>
+                      <div className="absolute bottom-3 right-2 w-1.5 h-1.5 bg-emerald-300 rounded-full animate-sparkle-delayed opacity-60"></div>
+                    </div>
+
+                    {/* Enhanced badge name with premium styling */}
+                    <div className="relative mb-4">
+                      <h3 className="text-2xl font-black text-center bg-gradient-to-r from-emerald-200 via-gold-200 to-emerald-200 bg-clip-text text-transparent leading-tight drop-shadow-sm">
+                        {userBadge.badge_id.name}
+                      </h3>
+                      {/* Underline accent */}
+                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-16 h-0.5 bg-gradient-to-r from-transparent via-gold-400 to-transparent"></div>
+                    </div>
+
+                    {/* Premium category tag */}
+                    <div className="flex justify-center mb-4">
+                      <span className="inline-flex items-center px-5 py-2.5 rounded-full text-sm font-bold bg-gradient-to-r from-emerald-500/20 to-gold-500/20 backdrop-blur-md text-emerald-200 border border-emerald-400/30 shadow-lg shadow-emerald-500/20">
+                        <div className="w-2.5 h-2.5 bg-gradient-to-r from-emerald-300 to-gold-300 rounded-full mr-3 animate-pulse-glow"></div>
+                        EARNED • {userBadge.badge_id.category}
+                      </span>
+                    </div>
+
+                    {/* Enhanced description */}
+                    <p className="text-sm text-slate-200 text-center mb-6 leading-relaxed line-clamp-3 font-medium px-2">
+                      {userBadge.badge_id.description}
+                    </p>
+
+                    {/* Premium points display */}
+                    <div className="flex items-center justify-center mb-4">
+                      <div className="flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-gold-500/30 to-yellow-500/30 backdrop-blur-sm border border-gold-400/40 shadow-lg shadow-gold-500/20">
+                        <div className="relative mr-3">
+                          <div className="absolute inset-0 bg-gold-300 rounded-full animate-ping opacity-40"></div>
+                          <div className="absolute inset-0.5 bg-yellow-300 rounded-full animate-ping opacity-30 animation-delay-200"></div>
+                          <svg
+                            className="relative h-6 w-6 text-gold-200"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-lg font-black bg-gradient-to-r from-gold-100 to-yellow-100 bg-clip-text text-transparent">
+                          {userBadge.badge_id.points} POINTS
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Premium earned date display */}
+                    <div className="flex items-center justify-center">
+                      <div className="flex items-center px-4 py-2.5 rounded-full bg-gradient-to-r from-emerald-500/15 to-teal-500/15 backdrop-blur-sm border border-emerald-400/25 text-emerald-200 shadow-lg shadow-emerald-500/10">
+                        <div className="relative mr-2">
+                          <svg
+                            className="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                          <div className="absolute inset-0 bg-emerald-300 rounded-full animate-ping opacity-20"></div>
+                        </div>
+                        <span className="text-sm font-semibold">
+                          🏆 Earned{" "}
+                          {userBadge.earned_at
+                            ? new Date(userBadge.earned_at).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                }
+                              )
+                            : "Unknown"}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-purple-400 text-white rounded-full p-1 z-10 shadow-lg shadow-purple-500/30">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="font-semibold text-lg text-center mb-1 text-white">
-                    {userBadge.badge_id.name}
-                  </h3>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-900/50 text-purple-300 border border-purple-700/30 mb-2">
-                    {userBadge.badge_id.category}
-                  </span>
-                  <p className="text-sm text-blue-100/70 text-center mb-3 line-clamp-3">
-                    {userBadge.badge_id.description}
-                  </p>
-                  <div className="flex items-center mt-auto">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-1 text-yellow-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <span className="text-sm font-medium text-white">
-                      {userBadge.badge_id.points} points
-                    </span>
-                  </div>
-                  <div className="flex items-center mt-2 text-purple-300">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-1"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    <span className="text-xs">
-                      Earned on{" "}
-                      {userBadge.earned_at
-                        ? new Date(userBadge.earned_at).toLocaleDateString()
-                        : "Unknown date"}
-                    </span>
-                  </div>
+                )}
+
+                {/* Premium bottom accent with animated gradient */}
+                <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-400 via-gold-400 to-emerald-400 opacity-70 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="h-full w-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-slide"></div>
                 </div>
-              )}
+              </div>
             </Link>
           ))}
         </div>
